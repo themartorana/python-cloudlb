@@ -166,24 +166,75 @@ code, tt {
 </tr>
 </tbody>
 </table>
-<div class="section" id="test">
-<h1>Test</h1>
-<dl class="docutils">
-<dt>CREATE::</dt>
-<dd><p class="first">import cloudlb</p>
-<p>clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)</p>
-<p>clb.authenticate()</p>
-<dl class="last docutils">
-<dt>node1 = cloudlb.Node(address=&quot;10.180.160.131&quot;,</dt>
-<dd>port=80,
-condition=&quot;ENABLED&quot;)</dd>
-<dt>virtualIP1 = cloudlb.VirtualIP(</dt>
-<dd>type=&quot;PUBLIC&quot;)</dd>
-<dt>for x in clb.loadbalancers.list():</dt>
-<dd>print &quot;%s has %s node attached&quot; % (x.name, len(x.nodes))</dd>
-</dl>
-</dd>
-</dl>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>Not much documentation at the moment but just some quick typical usage
+scripts you can do with this library. This is based on the latest version from :</p>
+<p><a class="reference external" href="http://docs.rackspacecloud.com/loadbalancers/api/clb-devguide-latest.pdf">http://docs.rackspacecloud.com/loadbalancers/api/clb-devguide-latest.pdf</a></p>
+<p>Create a LoadBalancer:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+clb.authenticate()
+
+node1 = cloudlb.Node(address=&quot;10.180.160.131&quot;,
+                     port=80,
+                     condition=&quot;ENABLED&quot;)
+
+
+virtualIP1 = cloudlb.VirtualIP(
+                 type=&quot;PUBLIC&quot;)
+
+clb.loadbalancers.create(name=&quot;mytestinglb&quot;,
+                         port=80,
+                         protocol=&quot;HTTP&quot;,
+                         nodes=[node1],
+                         virtualIps=[virtualIp1])
+</pre>
+<p>List LoadBalancers:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+clb.authenticate()
+
+lbs = clb.loadbalancers.list()
+for lb in lbs:
+    print &quot;%s has %s node attached with IP addresses:&quot; % (lb.name, len(lb.nodes))
+    for ip in lb.virtualIps:
+        print &quot;%s/%s&quot; % (ip.ipVersion, ip.address)
+</pre>
+<p>Get LoadBalancer by ID:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+clb.authenticate()
+
+lb = clb.loadbalancers.get(LoadBalancerID)
+</pre>
+<p>Delete LoadBalancer:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+clb.authenticate()
+
+lb = clb.loadbalancers.get(LoadBalancerID)
+lb.delete()
+</pre>
+<p>List deleted LoadBalancers:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+clb.authenticate()
+
+lbs = clb.loadbalancers.list_deleted()
+for x in lbs:
+    print x.name
+</pre>
 </div>
 </div>
 </body>
