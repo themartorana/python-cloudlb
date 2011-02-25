@@ -168,12 +168,12 @@ code, tt {
 </table>
 <div class="section" id="test">
 <h1>Test</h1>
-<p><em>CREATE</em></p>
-<blockquote>
-<p>import cloudlb
-clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
-clb.authenticate()</p>
 <dl class="docutils">
+<dt>CREATE::</dt>
+<dd><p class="first">import cloudlb</p>
+<p>clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)</p>
+<p>clb.authenticate()</p>
+<dl class="last docutils">
 <dt>node1 = cloudlb.Node(address=&quot;10.180.160.131&quot;,</dt>
 <dd>port=80,
 condition=&quot;ENABLED&quot;)</dd>
@@ -182,7 +182,8 @@ condition=&quot;ENABLED&quot;)</dd>
 <dt>for x in clb.loadbalancers.list():</dt>
 <dd>print &quot;%s has %s node attached&quot; % (x.name, len(x.nodes))</dd>
 </dl>
-</blockquote>
+</dd>
+</dl>
 </div>
 </div>
 </body>

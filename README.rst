@@ -9,10 +9,11 @@
 Test
 ====
 
-*CREATE*
-
+CREATE::
   import cloudlb
+
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
   clb.authenticate()
 
   node1 = cloudlb.Node(address="10.180.160.131",
