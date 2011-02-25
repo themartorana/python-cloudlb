@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 """ Base object class, basically the same class taken
 from jacobian python-cloudservers library"""
+import datetime
 
 
 class Resource(object):
@@ -145,3 +146,11 @@ def getid(obj):
         return obj.id
     except AttributeError:
         return int(obj)
+
+
+def convert_time(dt):
+    """
+    Convert iso8601 to datetime
+    """
+    isoFormat = "%Y-%m-%dT%H:%M:%S+0000"
+    return datetime.datetime.strptime(dt, isoFormat)

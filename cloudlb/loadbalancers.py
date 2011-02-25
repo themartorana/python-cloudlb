@@ -25,6 +25,9 @@ class LoadBalancer(base.Resource):
             if k == "virtualIps":
                 v = [VirtualIP(**x) for x in v]
 
+            if k in ('created', 'updated'):
+                v['time'] = base.convert_time(v['time'])
+
             setattr(self, k, v)
 
 
