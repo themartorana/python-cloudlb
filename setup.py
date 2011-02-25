@@ -3,9 +3,9 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 import os
 from setuptools import setup, find_packages
-import clb.consts
+import cloudlb.consts
 
-NAME = "python-clb"
+NAME = "python-cloudlb"
 GITHUB_URL = "https://github.com/chmouel/%s" % (NAME)
 DESCRIPTION = "Python interface to Rackspace Load Balancer" + \
     " as a Service product"
@@ -15,8 +15,8 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name=NAME,
-      version=clb.consts.VERSION,
-      download_url="%s/zipball/%s" % (GITHUB_URL, clb.consts.VERSION),
+      version=cloudlb.consts.VERSION,
+      download_url="%s/zipball/%s" % (GITHUB_URL, cloudlb.consts.VERSION),
       description=DESCRIPTION,
       author='Chmouel Boudjnah',
       author_email='chmouel@chmouel.com',
