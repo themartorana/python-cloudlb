@@ -4,6 +4,9 @@ import cloudlb.base
 
 
 class VirtualIP(cloudlb.base.SubResource):
+    def __repr__(self):
+        return "<VirtualIP: %s:%s>" % (self._address, self._type)
+
     def __init__(self, address=None,
                  ipVersion=None,
                  type=None,

@@ -4,6 +4,9 @@ import cloudlb.base
 
 
 class Node(cloudlb.base.SubResource):
+    def __repr__(self):
+        return "<Node: %s:%s>" % (self._address, self._port)
+
     def __init__(self, address=None,
                  port=None,
                  condition=None,
