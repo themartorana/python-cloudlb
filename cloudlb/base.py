@@ -153,4 +153,6 @@ def convert_time(dt):
     Convert iso8601 to datetime
     """
     isoFormat = "%Y-%m-%dT%H:%M:%S+0000"
+    if type(dt) is datetime.datetime:
+        return dt
     return datetime.datetime.strptime(dt, isoFormat)
