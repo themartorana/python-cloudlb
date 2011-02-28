@@ -111,16 +111,6 @@ class ManagerWithFind(Manager):
 
 
 class SubResource(object):
-    """
-    Resources attached to a main resource but not accessed
-    directly from the API. Like the repr of a dict inside a dict.
-    """
-    def __getattr__(self, k):
-        if '_%s' % (k) in self.__dict__:
-            return self.__dict__['_%s' % (k)]
-        else:
-            raise AttributeError(k)
-
     def toDict(self):
         """
         Convert the local attributes to a dict
@@ -128,13 +118,9 @@ class SubResource(object):
         ret = {}
         for attr in self.__dict__:
             if self.__dict__[attr]:
-                ret[attr.replace("_", "")] = self.__dict__[attr]
+                if not attr.startswith("_"):
+                    ret[attr] = self.__dict__[attr]
         return ret
-
-    def _add_details(self, info):
-        for (k, v) in info.iteritems():
-            if k.startswith("_") and self.__dict__[k]:
-                setattr(self, k.replace("_", ""), v)
 
 
 def getid(obj):
