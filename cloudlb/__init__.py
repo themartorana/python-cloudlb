@@ -13,18 +13,15 @@ class CloudLoadBalancer(object):
     TODO:
     """
 
-    def __init__(self,
-                 username,
-                 api_key,
-                 region,
-                 **kwargs):
-
+    def __init__(self, username, api_key, region, **kwargs):
         self.client = CLBClient(username,
                                 api_key,
                                 region,
                                 **kwargs)
-
         self.loadbalancers = LoadBalancerManager(self)
+
+    def show_limits(self):
+        return self.client.get("/loadbalancers/limits")[1]['limits']
 
     def authenticate(self):
         """
