@@ -137,11 +137,6 @@ class SubResourceDict(object):
     def __len__(self):
         return len(self.dico)
 
-    def get(self, nodeId):
-        for d in self.dico:
-            if d.id == nodeId:
-                return d
-
     #Trying hard to look like a dict.. Not sure if I should do that.
     def __repr__(self):
         ret = '['

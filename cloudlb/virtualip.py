@@ -11,6 +11,7 @@ class VirtualIP(cloudlb.base.SubResource):
                  ipVersion=None,
                  type=None,
                  id=None,
+                 parent=None,
                  **kwargs):
         self.address = address
         self.ipVersion = ipVersion
@@ -18,6 +19,7 @@ class VirtualIP(cloudlb.base.SubResource):
         self.id = id
         if self.id:
             self.id = int(id)
+        self._parent = parent
 
         #TODO: check for type to be a proper one passed
 

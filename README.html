@@ -432,7 +432,7 @@ node = lb.nodes[0] #get the first node
 
 node.delete() #delete it
 </pre>
-<p>Update attributes of a node (and usage of .get on nodes)</p>
+<p>Update attributes of a node</p>
 <pre class="literal-block">
 #!/usr/bin/python
 import cloudlb
@@ -451,6 +451,24 @@ node = mylb.nodes.get(nodeid)
 toggle_status = node.condition == &quot;ENABLED&quot; and &quot;DISABLED&quot; or &quot;ENABLED&quot;
 node.condition = toggle_status
 node.update()
+</pre>
+<p>Get weight of a node by using .get()</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+newnode =  cloudlb.Node(address=&quot;10.180.160.131&quot;,
+                        port=80,
+                        condition=&quot;ENABLED&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #add to the first one
+
+nodeid = 14106
+nodes = mylb.nodes
+node = mylb.nodes.get(nodeid)
+print node.weight
 </pre>
 </div>
 </div>

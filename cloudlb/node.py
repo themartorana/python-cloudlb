@@ -1,6 +1,17 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
-from cloudlb.base import SubResource
+from cloudlb.base import SubResource, SubResourceDict
+
+
+class NodeDict(SubResourceDict):
+    def get(self, nodeId):
+        for d in self.dico:
+            if d.id == nodeId:
+                #I should probably not play with magic like that.
+                #I really need to make it less confusing this look like PERL.
+                return type(d)(**(d._parent.manager.api.client.get(
+                            "/loadbalancers/%d/nodes/%d.json" % \
+                                (d._parent.id, nodeId))[1].values()[0]))
 
 
 class Node(SubResource):
@@ -13,8 +24,10 @@ class Node(SubResource):
                  condition=None,
                  status=None,
                  id=None,
+                 weight=None,
                  **kwargs):
         self.port = port
+        self.weight = weight
         self.address = address
         self.condition = condition
         self.status = status

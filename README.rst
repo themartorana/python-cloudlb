@@ -120,7 +120,7 @@ Delete a node from a LB::
 
   node.delete() #delete it
 
-Update attributes of a node (and usage of .get on nodes) ::
+Update attributes of a node ::
 
   #!/usr/bin/python
   import cloudlb
@@ -140,3 +140,20 @@ Update attributes of a node (and usage of .get on nodes) ::
   node.condition = toggle_status
   node.update()
 
+Get weight of a node by using .get() ::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+ 
+  newnode =  cloudlb.Node(address="10.180.160.131",
+                          port=80,
+                          condition="ENABLED")
+
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #add to the first one
+
+  nodeid = 14106
+  nodes = mylb.nodes  
+  node = mylb.nodes.get(nodeid)
+  print node.weight

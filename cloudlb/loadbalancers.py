@@ -3,7 +3,7 @@ __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 from cloudlb import base
 from cloudlb.consts import LB_PROTOCOLS
 from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
-from cloudlb.node import Node
+from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
 
 
@@ -20,10 +20,10 @@ class LoadBalancer(base.Resource):
     def _add_details(self, info):
         for (k, v) in info.iteritems():
             if k == "nodes":
-                v = base.SubResourceDict([Node(parent=self, **x) for x in v])
+                v = NodeDict([Node(parent=self, **x) for x in v])
 
             if k == "virtualIps":
-                v = [VirtualIP(**x) for x in v]
+                v = [VirtualIP(parent=self, **x) for x in v]
 
             if k in ('created', 'updated'):
                 v['time'] = base.convert_time(v['time'])
