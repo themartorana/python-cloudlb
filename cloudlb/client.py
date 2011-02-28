@@ -93,6 +93,9 @@ class CLBClient(httplib2.Http):
 
         return response, body
 
+    def put(self, url, **kwargs):
+        return self._cloudlb_request(url, 'PUT', **kwargs)
+
     def get(self, url, **kwargs):
         return self._cloudlb_request(url, 'GET', **kwargs)
 
