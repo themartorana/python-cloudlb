@@ -30,6 +30,9 @@ class LoadBalancer(base.Resource):
 
             setattr(self, k, v)
 
+    def add_nodes(self, nodes):
+        self.manager.add_nodes(self.id, nodes)
+
 
 class LoadBalancerManager(base.ManagerWithFind):
     resource_class = LoadBalancer
@@ -101,3 +104,14 @@ class LoadBalancerManager(base.ManagerWithFind):
         :rtype: :class:`LoadBalancer`
         """
         self._delete("/loadbalancers/%s" % base.getid(loadbalancerid))
+
+    def add_nodes(self, id, nodes):
+        nodeDico = [x.toDict() for x in nodes]
+        self._action('nodes', "%d/nodes" % base.getid(id), \
+                         nodeDico)
+
+    def _action(self, action, url, info=None):
+        """
+        Perform a loadbalancer "action" add/delete/remove node.
+        """
+        self.api.client.post('/loadbalancers/%s' % url, body={action: info})
