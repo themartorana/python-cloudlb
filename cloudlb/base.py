@@ -20,7 +20,7 @@ class Resource(object):
     def __getattr__(self, k):
         self.get()
         if k not in self.__dict__:
-            raise AttributeError(k)
+            raise AttributeError("Object has no attribute '%s'" % k)
         else:
             return self.__dict__[k]
 
