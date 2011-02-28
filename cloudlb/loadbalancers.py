@@ -2,7 +2,7 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 from cloudlb import base
 from cloudlb.consts import LB_PROTOCOLS
-from cloudlb.errors import InvalidProtocol
+from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
 from cloudlb.node import Node
 from cloudlb.virtualip import VirtualIP
 
@@ -79,6 +79,9 @@ class LoadBalancerManager(base.ManagerWithFind):
 
         nodeDico = [x.toDict() for x in nodes]
         vipDico = [x.toDict() for x in virtualIps]
+
+        if len(name) > 128:
+            raise InvalidLoadBalancerName("LB name is too long.")
 
         body = {"loadBalancer": {
             "name": name,

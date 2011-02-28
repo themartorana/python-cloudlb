@@ -37,3 +37,15 @@ class AuthenticationFailed(Exception):
     Raised on a failure to authenticate.
     """
     pass
+
+
+class InvalidLoadBalancerName(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+        Exception.__init__(self)
+
+    def __str__(self):
+        return '%s' % (self.reason)
+
+    def __repr__(self):
+        return '%s' % (self.reason)
