@@ -1,0 +1,9 @@
+
+* TODO Add version in cloudlb.__init__.py
+* TODO Grep TODO: for defining proper exceptions.
+* TODO Coverage testing.
+* TODO Methods Documentation.
+* TODO paging support.
+* TODO changes-since support.
+* TODO create with virtualIp being ID not working.
+* DONE Add limits.
