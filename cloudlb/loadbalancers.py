@@ -41,7 +41,7 @@ class LoadBalancerManager(base.ManagerWithFind):
         :param loadbalancerid: ID of the :class:`LoadBalancer` to get.
         :rtype: :class:`LoadBalancer`
         """
-        return self._get("/loadbalancers.json/%s" % \
+        return self._get("/loadbalancers/%s.json" % \
                       base.getid(loadbalancerid), "loadBalancer")
 
     def list(self):
