@@ -71,6 +71,14 @@ class CLBClient(httplib2.Http):
         ext = ""
         fullurl = "%s%s%s" % (self.region_account_url, url, ext)
 
+        #DEBUGGING:
+        if 'PYTHON_CLOUDB_DEBUG' in os.environ:
+            print "URL: %s" % (fullurl)
+            print "ARGS: %s" % (str(kwargs))
+            if 'body' in kwargs:
+                from pprint import pprint as p
+                p(kwargs['body'])
+
         response, body = self.request(fullurl, method, **kwargs)
 
         if body:
