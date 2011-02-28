@@ -69,9 +69,6 @@ class CLBClient(httplib2.Http):
             kwargs['body'] = json.dumps(kwargs['body'])
 
         ext = ""
-        if method == "GET":
-            ext = ".json"
-
         fullurl = "%s%s%s" % (self.region_account_url, url, ext)
 
         response, body = self.request(fullurl, method, **kwargs)

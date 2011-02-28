@@ -41,7 +41,7 @@ class LoadBalancerManager(base.ManagerWithFind):
         :param loadbalancerid: ID of the :class:`LoadBalancer` to get.
         :rtype: :class:`LoadBalancer`
         """
-        return self._get("/loadbalancers/%s" % \
+        return self._get("/loadbalancers.json/%s" % \
                       base.getid(loadbalancerid), "loadBalancer")
 
     def list(self):
@@ -52,7 +52,7 @@ class LoadBalancerManager(base.ManagerWithFind):
         Arguments:
         """
         return [x for x in \
-                    self._list("/loadbalancers", "loadBalancers") \
+                    self._list("/loadbalancers.json", "loadBalancers") \
                  if x._info['status'] != "DELETED"]
 
     def list_deleted(self):
@@ -62,7 +62,7 @@ class LoadBalancerManager(base.ManagerWithFind):
 
         Arguments:
         """
-        return [x for x in self._list("/loadbalancers", "loadBalancers") \
+        return [x for x in self._list("/loadbalancers.json", "loadBalancers") \
                  if x._info['status'] == "DELETED"]
 
     def create(self, name, port,
