@@ -111,15 +111,16 @@ class ManagerWithFind(Manager):
 
 
 class SubResource(object):
-    def toDict(self):
+    def toDict(self, includeNone=False):
         """
         Convert the local attributes to a dict
         """
         ret = {}
         for attr in self.__dict__:
-            if self.__dict__[attr]:
-                if not attr.startswith("_"):
-                    ret[attr] = self.__dict__[attr]
+            if type(self.__dict__[attr]) is None and not includeNone:
+                continue
+            if not attr.startswith("_"):
+                ret[attr] = self.__dict__[attr]
         return ret
 
 

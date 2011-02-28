@@ -9,7 +9,8 @@ class NodeDict(SubResourceDict):
             if d.id == nodeId:
                 #I should probably not play with magic like that.
                 #I really need to make it less confusing this look like PERL.
-                return type(d)(**(d._parent.manager.api.client.get(
+                return type(d)(parent=d._parent,
+                               **(d._parent.manager.api.client.get(
                             "/loadbalancers/%d/nodes/%d.json" % \
                                 (d._parent.id, nodeId))[1].values()[0]))
 
@@ -33,10 +34,10 @@ class Node(SubResource):
         self.status = status
         self.id = id
         self._parent = parent
-        self._originalInfo = self.toDict()
+        self._originalInfo = self.toDict(includeNone=True)
 
         if not all([self.port, self.address, self.condition]):
-            #TODO: Proper check on conditon as well
+            #TODO: Proper Exceptions
             raise Exception("You need to specify a" + \
                                 " port address and a condition")
 
