@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
-import cloudlb.base
+from cloudlb.base import SubResource
 
 
-class Node(cloudlb.base.SubResource):
+class Node(SubResource):
     def __repr__(self):
         return "<Node: %s:%s>" % (self._address, self._port)
 
@@ -23,3 +23,8 @@ class Node(cloudlb.base.SubResource):
             #TODO: Proper check on conditon as well
             raise Exception("You need to specify a" + \
                                 " port address and a condition")
+
+        ret = {}
+        for k in self.__dict__:
+            ret[k] = self.__dict__[k]
+        self._add_details(ret)
