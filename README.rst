@@ -20,7 +20,6 @@ Create a LoadBalancer::
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
-  clb.authenticate()
 
   node1 = cloudlb.Node(address="10.180.160.131",
                        port=80,
@@ -42,7 +41,6 @@ List LoadBalancers::
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
-  clb.authenticate()
 
   lbs = clb.loadbalancers.list()
   for lb in lbs:
@@ -50,7 +48,7 @@ List LoadBalancers::
       for ip in lb.virtualIps:
           print "%s/%s" % (ip.ipVersion, ip.address)
 
-Get LoadBalancer by ID::
+Get LB by ID::
 
   #!/usr/bin/python
   import cloudlb
@@ -59,23 +57,65 @@ Get LoadBalancer by ID::
 
   lb = clb.loadbalancers.get(LoadBalancerID)
 
-Delete LoadBalancer::
+Delete LB::
 
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
-  clb.authenticate()
 
   lb = clb.loadbalancers.get(LoadBalancerID)
   lb.delete()
 
-List deleted LoadBalancers::
+List deleted LBs::
 
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
-  clb.authenticate()
 
   lbs = clb.loadbalancers.list_deleted()
   for x in lbs:
       print x.name
+
+List nodes of a LB::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
+  lbs = clb.loadbalancers.list_deleted()
+  lb = lbs[0] #get the first one
+  for node in lb.nodes:
+      print node.address
+
+Add a node to a LB::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+ 
+  newnode =  cloudlb.Node(address="10.180.160.131",
+                          port=80,
+                          condition="ENABLED")
+
+  lbs = clb.loadbalancers.list()
+  lb = lbs[0] #add to the first one
+
+  lb.add_nodes([newnode])
+  
+
+Delete a node from a LB::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+ 
+  newnode =  cloudlb.Node(address="10.180.160.131",
+                          port=80,
+                          condition="ENABLED")
+
+  lbs = clb.loadbalancers.list()
+  lb = lbs[0] #add to the first one
+
+  node = lb.nodes[0] #get the first node
+
+  node.delete() #delete it
