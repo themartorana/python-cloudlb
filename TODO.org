@@ -6,4 +6,5 @@
 * TODO paging support.
 * TODO changes-since support.
 * TODO create with virtualIp being ID not working.
+* TODO Add .get by ID on nodes or virtualIp
 * DONE Add limits.
