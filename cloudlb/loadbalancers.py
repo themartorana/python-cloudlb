@@ -110,14 +110,20 @@ class LoadBalancerManager(base.ManagerWithFind):
         self._action('nodes', "%d/nodes" % base.getid(loadbalancerId), \
                          nodeDico)
 
-    def delete_node(self, loadBalancerId, nodeId, node):
+    def delete_node(self, loadBalancerId, nodeId):
         self.api.client.delete('/loadbalancers/%d/nodes/%d' % (
                 base.getid(loadBalancerId),
                 base.getid(nodeId),
                 ))
 
+    def update_node(self, loadBalancerId, nodeId, dico):
+        self.api.client.put('/loadbalancers/%d/nodes/%d' % (
+                base.getid(loadBalancerId),
+                base.getid(nodeId),
+                ), body={"node": dico})
+
     def _action(self, action, url, info=None):
         """
-        Perform a loadbalancer "action" add/delete/remove node.
+        Perform a loadbalancer POST "action".
         """
         self.api.client.post('/loadbalancers/%s' % url, body={action: info})

@@ -432,6 +432,27 @@ node = lb.nodes[0] #get the first node
 
 node.delete() #delete it
 </pre>
+<p>Update attributes of a node</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+newnode =  cloudlb.Node(address=&quot;10.180.160.131&quot;,
+                        port=80,
+                        condition=&quot;ENABLED&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #add to the first one
+
+nodeid = 14106
+nodes = mylb.nodes
+for node in mylb.nodes:
+    if node.id == nodeid: #TODO: in the future we will get a .get on nodes
+        # NOTE: Will Error if it's already DISABLED
+        node.condition = &quot;DISABLED&quot;
+        node.update()
+</pre>
 </div>
 </div>
 </body>
