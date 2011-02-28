@@ -432,7 +432,7 @@ node = lb.nodes[0] #get the first node
 
 node.delete() #delete it
 </pre>
-<p>Update attributes of a node</p>
+<p>Update attributes of a node (and usage of .get on nodes)</p>
 <pre class="literal-block">
 #!/usr/bin/python
 import cloudlb
@@ -447,11 +447,10 @@ mylb = lbs[0] #add to the first one
 
 nodeid = 14106
 nodes = mylb.nodes
-for node in mylb.nodes:
-    if node.id == nodeid: #TODO: in the future we will get a .get on nodes
-        # NOTE: Will Error if it's already DISABLED
-        node.condition = &quot;DISABLED&quot;
-        node.update()
+node = mylb.nodes.get(nodeid)
+toggle_status = node.condition == &quot;ENABLED&quot; and &quot;DISABLED&quot; or &quot;ENABLED&quot;
+node.condition = toggle_status
+node.update()
 </pre>
 </div>
 </div>

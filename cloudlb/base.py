@@ -123,6 +123,35 @@ class SubResource(object):
         return ret
 
 
+class SubResourceDict(object):
+    def __init__(self, dico):
+        self.dico = dico
+
+    def __iter__(self):
+        for d in self.dico:
+            yield d
+
+    def __getitem__(self, i):
+        return self.dico[i]
+
+    def __len__(self):
+        return len(self.dico)
+
+    def get(self, nodeId):
+        for d in self.dico:
+            if d.id == nodeId:
+                return d
+
+    #Trying hard to look like a dict.. Not sure if I should do that.
+    def __repr__(self):
+        ret = '['
+        for d in self.dico:
+            ret += str(d)
+            ret += ", "
+        ret = ret[0:-2] + "]"
+        return ret
+
+
 def getid(obj):
     """
     Abstracts the common pattern of allowing both an object or an object's ID

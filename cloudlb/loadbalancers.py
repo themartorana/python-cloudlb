@@ -20,7 +20,7 @@ class LoadBalancer(base.Resource):
     def _add_details(self, info):
         for (k, v) in info.iteritems():
             if k == "nodes":
-                v = [Node(parent=self, **x) for x in v]
+                v = base.SubResourceDict([Node(parent=self, **x) for x in v])
 
             if k == "virtualIps":
                 v = [VirtualIP(**x) for x in v]

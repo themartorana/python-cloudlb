@@ -120,7 +120,7 @@ Delete a node from a LB::
 
   node.delete() #delete it
 
-Update attributes of a node ::
+Update attributes of a node (and usage of .get on nodes) ::
 
   #!/usr/bin/python
   import cloudlb
@@ -135,8 +135,8 @@ Update attributes of a node ::
 
   nodeid = 14106
   nodes = mylb.nodes  
-  for node in mylb.nodes:
-      if node.id == nodeid: #TODO: in the future we will get a .get on nodes
-          # NOTE: Will Error if it's already DISABLED
-          node.condition = "DISABLED"
-          node.update()
+  node = mylb.nodes.get(nodeid)
+  toggle_status = node.condition == "ENABLED" and "DISABLED" or "ENABLED"
+  node.condition = toggle_status
+  node.update()
+
