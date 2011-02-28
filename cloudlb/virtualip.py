@@ -14,10 +14,14 @@ class VirtualIP(cloudlb.base.SubResource):
                  **kwargs):
         self._address = address
         self._ipVersion = ipVersion
-        self._id = id
         self._type = type
+        self._id = id
+        if self._id:
+            self._id = int(id)
 
-        if not all([self._type]):
+        #TODO: check for type to be proper
+
+        if not any([self._type, self._id]):
             #TODO: Proper check on conditon as well
             raise Exception("You need to specify a" + \
-                                " port address and a condition")
+                                " type or an id (for shared ip)")
