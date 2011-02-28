@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 import cloudlb.base
+from cloudlb.consts import LB_PROTOCOLS
 
 
 class VirtualIP(cloudlb.base.SubResource):
@@ -21,7 +22,9 @@ class VirtualIP(cloudlb.base.SubResource):
             self.id = int(id)
         self._parent = parent
 
-        #TODO: check for type to be a proper one passed
+        if not self.type in LB_PROTOCOLS:
+            #TODO: Proper check on conditon as well
+            raise Exception("You have specified a invalid protocol")
 
         if not any([self.type, self.id]):
             #TODO: Proper check on conditon as well

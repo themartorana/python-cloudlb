@@ -15,3 +15,5 @@ REGION_URL = "https://%s.loadbalancers.api.rackspacecloud.com/v1.0"
 LB_PROTOCOLS = ["FTP", "HTTP", "IMAPv4", "POP3", "LDAP",
               "LDAPS", "HTTPS", "IMAPS",
               "POP3S", "SMTP"]
+
+VIRTUALIP_TYPES = ["PUBLIC", "SERVICENET"]
