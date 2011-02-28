@@ -20,7 +20,7 @@ class LoadBalancer(base.Resource):
     def _add_details(self, info):
         for (k, v) in info.iteritems():
             if k == "nodes":
-                v = [Node(**x) for x in v]
+                v = [Node(parent=self, **x) for x in v]
 
             if k == "virtualIps":
                 v = [VirtualIP(**x) for x in v]
@@ -105,10 +105,16 @@ class LoadBalancerManager(base.ManagerWithFind):
         """
         self._delete("/loadbalancers/%s" % base.getid(loadbalancerid))
 
-    def add_nodes(self, id, nodes):
+    def add_nodes(self, loadbalancerId, nodes):
         nodeDico = [x.toDict() for x in nodes]
-        self._action('nodes', "%d/nodes" % base.getid(id), \
+        self._action('nodes', "%d/nodes" % base.getid(loadbalancerId), \
                          nodeDico)
+
+    def delete_node(self, loadBalancerId, nodeId, node):
+        self.api.client.delete('/loadbalancers/%d/nodes/%d' % (
+                base.getid(loadBalancerId),
+                base.getid(nodeId),
+                ))
 
     def _action(self, action, url, info=None):
         """

@@ -5,26 +5,27 @@ from cloudlb.base import SubResource
 
 class Node(SubResource):
     def __repr__(self):
-        return "<Node: %s:%s>" % (self._address, self._port)
+        return "<Node: %s:%s>" % (self.address, self.port)
 
-    def __init__(self, address=None,
+    def __init__(self, parent=None,
+                 address=None,
                  port=None,
                  condition=None,
                  status=None,
                  id=None,
                  **kwargs):
-        self._port = port
-        self._address = address
-        self._condition = condition
-        self._status = status
-        self._id = id
+        self.port = port
+        self.address = address
+        self.condition = condition
+        self.status = status
+        self.id = id
+        self._parent = parent
 
-        if not all([self._port, self._address, self._condition]):
+        if not all([self.port, self.address, self.condition]):
             #TODO: Proper check on conditon as well
             raise Exception("You need to specify a" + \
                                 " port address and a condition")
 
-        ret = {}
-        for k in self.__dict__:
-            ret[k] = self.__dict__[k]
-        self._add_details(ret)
+    def delete(self):
+        self._parent.manager.delete_node(self._parent.id,
+                                         self.id, self.toDict())
