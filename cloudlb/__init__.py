@@ -4,7 +4,9 @@ from cloudlb.client import CLBClient
 from cloudlb.loadbalancers import LoadBalancerManager
 from cloudlb.node import Node
 from cloudlb.virtualip import VirtualIP
+from cloudlb.consts import VERSION
 
+__version__ = VERSION
 
 class CloudLoadBalancer(object):
     """

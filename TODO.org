@@ -1,5 +1,4 @@
 
-* TODO Add version in cloudlb.__init__.py
 * TODO Grep TODO: for defining proper exceptions.
 * TODO Coverage testing.
 * TODO Methods Documentation.
@@ -7,5 +6,6 @@
 * TODO changes-since support.
 * TODO create with virtualIp being ID not working.
 * TODO Make virtualIps using the same stuff as nodes.
+* DONE Add version in cloudlb.__init__.py
 * DONE Add .get by ID on nodes.
 * DONE Add limits.
