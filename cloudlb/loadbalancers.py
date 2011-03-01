@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 from cloudlb import base
-from cloudlb.consts import LB_PROTOCOLS
+from cloudlb.consts import LB_PROTOCOLS, LB_ATTRIBUTES_MODIFIABLE
 from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
 from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
@@ -32,6 +32,9 @@ class LoadBalancer(base.Resource):
 
     def add_nodes(self, nodes):
         self.manager.add_nodes(self.id, nodes)
+
+    def update(self):
+        self.manager.update(self, self._info, self.__dict__)
 
 
 class LoadBalancerManager(base.ManagerWithFind):
@@ -78,7 +81,8 @@ class LoadBalancerManager(base.ManagerWithFind):
         """
 
         if not protocol in LB_PROTOCOLS:
-            raise InvalidProtocol()
+            raise InvalidProtocol("''%s'' is not a valid protocol" % \
+                                      (protocol))
 
         nodeDico = [x.toDict() for x in nodes]
         vipDico = [x.toDict() for x in virtualIps]
@@ -122,6 +126,22 @@ class LoadBalancerManager(base.ManagerWithFind):
                 base.getid(loadBalancerId),
                 base.getid(nodeId),
                 ), body={"node": dico})
+
+    def update(self, lb, originalInfo, info):
+        ret = {}
+        for k in LB_ATTRIBUTES_MODIFIABLE:
+            if k in originalInfo and info[k] != originalInfo[k]:
+                ret[k] = info[k]
+
+        if 'protocol' in ret.keys() and ret['protocol'] not in LB_PROTOCOLS:
+            raise InvalidProtocol("''%s'' is not a valid protocol" % \
+                                      (ret['protocol']))
+
+        if not ret:
+            #TODO: proper Exceptions:
+            raise Exception("Nothing to update.")
+
+        self.api.client.put('/loadbalancers/%s' % base.getid(lb), body=ret)
 
     def _action(self, action, url, info=None):
         """

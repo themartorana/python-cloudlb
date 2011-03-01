@@ -109,10 +109,6 @@ Delete a node from a LB::
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
  
-  newnode =  cloudlb.Node(address="10.180.160.131",
-                          port=80,
-                          condition="ENABLED")
-
   lbs = clb.loadbalancers.list()
   lb = lbs[0] #add to the first one
 
@@ -120,16 +116,12 @@ Delete a node from a LB::
 
   node.delete() #delete it
 
-Update attributes of a node ::
+Update attributes of a node::
 
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
  
-  newnode =  cloudlb.Node(address="10.180.160.131",
-                          port=80,
-                          condition="ENABLED")
-
   lbs = clb.loadbalancers.list()
   mylb = lbs[0] #add to the first one
 
@@ -140,16 +132,12 @@ Update attributes of a node ::
   node.condition = toggle_status
   node.update()
 
-Get weight of a node by using .get() ::
+Get weight of a node by using .get()::
 
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
  
-  newnode =  cloudlb.Node(address="10.180.160.131",
-                          port=80,
-                          condition="ENABLED")
-
   lbs = clb.loadbalancers.list()
   mylb = lbs[0] #add to the first one
 
@@ -157,3 +145,17 @@ Get weight of a node by using .get() ::
   nodes = mylb.nodes  
   node = mylb.nodes.get(nodeid)
   print node.weight
+
+Update attributes on LoadBalancer::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  mylb.protocol = "FTP"
+  mylb.name = "APrettyNewName"
+
+  mylb.update()
