@@ -159,7 +159,7 @@ def getid(obj):
         return int(obj)
 
 
-def convert_time(dt):
+def convert_iso_datetime(dt):
     """
     Convert iso8601 to datetime
     """

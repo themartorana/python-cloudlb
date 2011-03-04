@@ -5,6 +5,8 @@ from cloudlb.loadbalancers import LoadBalancerManager
 from cloudlb.node import Node
 from cloudlb.virtualip import VirtualIP
 from cloudlb.consts import VERSION
+from usage import get_usage
+from cloudlb import base
 
 __version__ = VERSION
 
@@ -21,6 +23,12 @@ class CloudLoadBalancer(object):
                                 region,
                                 **kwargs)
         self.loadbalancers = LoadBalancerManager(self)
+
+    def usage(self, startTime=None, endTime=None):
+        startTime = startTime and startTime.isoformat()
+        endTime = endTime and endTime.isoformat()
+        ret = get_usage(self.client, startTime=startTime, endTime=endTime)
+        return ret
 
     def show_limits(self):
         return self.client.get("/loadbalancers/limits")[1]['limits']

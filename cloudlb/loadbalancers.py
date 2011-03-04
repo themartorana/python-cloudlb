@@ -5,6 +5,7 @@ from cloudlb.consts import LB_PROTOCOLS, LB_ATTRIBUTES_MODIFIABLE
 from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
 from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
+from usage import get_usage
 
 
 class LoadBalancer(base.Resource):
@@ -26,7 +27,7 @@ class LoadBalancer(base.Resource):
                 v = [VirtualIP(parent=self, **x) for x in v]
 
             if k in ('created', 'updated'):
-                v['time'] = base.convert_time(v['time'])
+                v['time'] = base.convert_iso_datetime(v['time'])
 
             setattr(self, k, v)
 
@@ -35,6 +36,13 @@ class LoadBalancer(base.Resource):
 
     def update(self):
         self.manager.update(self, self._info, self.__dict__)
+
+    def usage(self, startTime=None, endTime=None):
+        startTime = startTime and startTime.isoformat()
+        endTime = endTime and endTime.isoformat()
+        ret = get_usage(self.manager.api.client, lbId=base.getid(self),
+                        startTime=startTime, endTime=endTime)
+        return ret
 
 
 class LoadBalancerManager(base.ManagerWithFind):

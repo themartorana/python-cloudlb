@@ -159,3 +159,24 @@ Update attributes on LoadBalancer::
   mylb.name = "APrettyNewName"
 
   mylb.update()
+
+Get usage statitiscs on all LoadBalancers::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb
+  print clb.usage()
+
+Get usage statitiscs on a specfic LoadBalancer::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  print mylb.usage()
+
