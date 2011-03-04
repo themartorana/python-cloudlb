@@ -117,7 +117,7 @@ class SubResource(object):
         """
         ret = {}
         for attr in self.__dict__:
-            if type(self.__dict__[attr]) is None and not includeNone:
+            if self.__dict__[attr] is None and not includeNone:
                 continue
             if not attr.startswith("_"):
                 ret[attr] = self.__dict__[attr]

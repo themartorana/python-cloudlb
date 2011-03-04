@@ -6,6 +6,7 @@ from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
 from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
 from usage import get_usage
+from accesslist import AccessList
 
 
 class LoadBalancer(base.Resource):
@@ -43,6 +44,10 @@ class LoadBalancer(base.Resource):
         ret = get_usage(self.manager.api.client, lbId=base.getid(self),
                         startTime=startTime, endTime=endTime)
         return ret
+
+    def accesslist(self):
+        accesslist = AccessList(self.manager.api.client, base.getid(self))
+        return accesslist
 
 
 class LoadBalancerManager(base.ManagerWithFind):

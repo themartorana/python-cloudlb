@@ -5,10 +5,9 @@ from cloudlb.loadbalancers import LoadBalancerManager
 from cloudlb.node import Node
 from cloudlb.virtualip import VirtualIP
 from cloudlb.consts import VERSION
-from usage import get_usage
-from cloudlb import base
-
 __version__ = VERSION
+from usage import get_usage
+
 
 class CloudLoadBalancer(object):
     """
