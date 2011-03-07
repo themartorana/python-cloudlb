@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 from cloudlb.base import SubResource
+from cloudlb.consts import HEALTH_MONITOR_TYPES
 
 
 class HealthMonitorManager(object):
@@ -51,6 +52,10 @@ class HealthMonitor(SubResource):
             #TODO: Proper Exceptions
             raise Exception("You need to specify a" + \
                                 " type timeout and attte.")
+
+        if not self.type in HEALTH_MONITOR_TYPES:
+            raise Exception("%s is an invalid healthmonitor type" % (
+                    self.type))
 
         if self.type in ("HTTP", "HTTPS"):
             self.path = path
