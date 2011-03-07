@@ -180,3 +180,64 @@ Get usage statitiscs on a specfic LoadBalancer::
 
   print mylb.usage()
 
+Get current Health Monitor::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  hm_monitor = mylb.healthmonitor()
+  print hm_monitor.get()
+
+Monitor loadbalancer using simple TCP Connect::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  hm_monitor = mylb.healthmonitor()
+  hm = cloudlb.healthmonitor.HealthMonitor(
+    type="CONNECT",
+    delay=10,
+    timeout=10,
+    attemptsBeforeDeactivation=3)
+  
+  hm_monitor.add(hm)
+
+Monitor loadbalancer using HTTP::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  hm_monitor = mylb.healthmonitor()
+  hm = cloudlb.healthmonitor.HealthMonitor(
+      type="HTTP",
+      delay=10,
+      timeout=10,
+      attemptsBeforeDeactivation=3,
+      path="/",
+      statusRegex="",
+      bodyRegex="testing")
+  hm_monitor.add(hm)
+
+Delete Health Monitor rule::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  hm_monitor = mylb.healthmonitor()
+  hm_monitor.delete()

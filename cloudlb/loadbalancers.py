@@ -7,7 +7,7 @@ from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
 from usage import get_usage
 from accesslist import AccessList
-
+from healthmonitor import HealthMonitorManager
 
 class LoadBalancer(base.Resource):
     def __repr__(self):
@@ -48,6 +48,10 @@ class LoadBalancer(base.Resource):
     def accesslist(self):
         accesslist = AccessList(self.manager.api.client, base.getid(self))
         return accesslist
+
+    def healthmonitor(self):
+        hm = HealthMonitorManager(self.manager.api.client, base.getid(self))
+        return hm
 
 
 class LoadBalancerManager(base.ManagerWithFind):

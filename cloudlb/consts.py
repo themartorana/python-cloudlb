@@ -25,3 +25,6 @@ LB_ATTRIBUTES_MODIFIABLE = ["name", "algorithm", "protocol", "port"]
 
 # Types of VirtualIPS
 VIRTUALIP_TYPES = ["PUBLIC", "SERVICENET"]
+
+# HealthMonitors Types
+HEALTH_MONITOR_TYPES = ['CONNECT', 'HTTP', 'HTTPS']

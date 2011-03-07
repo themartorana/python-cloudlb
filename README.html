@@ -334,6 +334,68 @@ mylb = lbs[0] #first lb
 
 print mylb.usage()
 </pre>
+<p>Get current Health Monitor:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+hm_monitor = mylb.healthmonitor()
+print hm_monitor.get()
+</pre>
+<p>Monitor loadbalancer using simple TCP Connect:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+hm_monitor = mylb.healthmonitor()
+hm = cloudlb.healthmonitor.HealthMonitor(
+  type=&quot;CONNECT&quot;,
+  delay=10,
+  timeout=10,
+  attemptsBeforeDeactivation=3)
+
+hm_monitor.add(hm)
+</pre>
+<p>Monitor loadbalancer using HTTP:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+hm_monitor = mylb.healthmonitor()
+hm = cloudlb.healthmonitor.HealthMonitor(
+    type=&quot;HTTP&quot;,
+    delay=10,
+    timeout=10,
+    attemptsBeforeDeactivation=3,
+    path=&quot;/&quot;,
+    statusRegex=&quot;&quot;,
+    bodyRegex=&quot;testing&quot;)
+hm_monitor.add(hm)
+</pre>
+<p>Delete Health Monitor rule:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+hm_monitor = mylb.healthmonitor()
+hm_monitor.delete()
+</pre>
 </div>
 </div>
 </body>
