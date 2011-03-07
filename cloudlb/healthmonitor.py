@@ -1,33 +1,12 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
-from cloudlb.base import SubResource
+from cloudlb.base import SubResource, SubResourceManager
 from cloudlb.consts import HEALTH_MONITOR_TYPES
 
 
-class HealthMonitorManager(object):
+class HealthMonitorManager(SubResourceManager):
     path = None
     type = "healthMonitor"
-
-    def __init__(self, client, lbId=None):
-        self.lbId = lbId
-        if self.lbId:
-            self.lbId = int(self.lbId)
-            self.path = "/loadbalancers/%s/%s" % (self.lbId, self.type.lower())
-
-        self.client = client
-
-    def get(self):
-        ret = self.client.get("%s.json" % self.path)
-        return ret[1][self.type]
-
-    def add(self, hm):
-        dico = hm.toDict()
-        ret = self.client.put(self.path, body=dico)
-        return ret
-
-    def delete(self):
-        ret = self.client.delete(self.path)
-        return ret
 
 
 class HealthMonitor(SubResource):

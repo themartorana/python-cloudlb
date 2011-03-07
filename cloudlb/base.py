@@ -110,6 +110,32 @@ class ManagerWithFind(Manager):
         return found
 
 
+class SubResourceManager(object):
+    path = None
+    type = None
+
+    def __init__(self, client, lbId=None):
+        self.lbId = lbId
+        if self.lbId:
+            self.lbId = int(self.lbId)
+            self.path = "/loadbalancers/%s/%s" % (self.lbId, self.type.lower())
+
+        self.client = client
+
+    def get(self):
+        ret = self.client.get("%s.json" % self.path)
+        return ret[1][self.type]
+
+    def add(self, ssp):
+        dico = ssp.toDict()
+        ret = self.client.put(self.path, body={self.type: dico})
+        return ret
+
+    def delete(self):
+        ret = self.client.delete(self.path)
+        return ret
+
+
 class SubResource(object):
     def toDict(self, includeNone=False):
         """
