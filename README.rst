@@ -241,3 +241,42 @@ Delete Health Monitor rule::
 
   hm_monitor = mylb.healthmonitor()
   hm_monitor.delete()
+
+Add http cookie session persistense::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  ss = cloudlb.sessionpersistense.SessionPersistense(persistenceType="HTTP_COOKIE")
+
+  ssp = mylb.session_persistense()
+  ssp.add(ss)
+
+Get session persistense::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  ssp = mylb.session_persistense()
+  print ssp.get()
+
+Delete session persistense configuration::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+
+  ssp = mylb.session_persistense()
+  ssp.delete()
+

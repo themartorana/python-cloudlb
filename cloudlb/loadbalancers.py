@@ -8,6 +8,8 @@ from cloudlb.virtualip import VirtualIP
 from usage import get_usage
 from accesslist import AccessList
 from healthmonitor import HealthMonitorManager
+from sessionpersistense import SessionPersistenseManager
+
 
 class LoadBalancer(base.Resource):
     def __repr__(self):
@@ -51,6 +53,11 @@ class LoadBalancer(base.Resource):
 
     def healthmonitor(self):
         hm = HealthMonitorManager(self.manager.api.client, base.getid(self))
+        return hm
+
+    def session_persistense(self):
+        hm = SessionPersistenseManager(
+            self.manager.api.client, base.getid(self))
         return hm
 
 

@@ -396,6 +396,44 @@ mylb = lbs[0] #first lb
 hm_monitor = mylb.healthmonitor()
 hm_monitor.delete()
 </pre>
+<p>Add http cookie session persistense:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+ss = cloudlb.sessionpersistense.SessionPersistense(persistenceType=&quot;HTTP_COOKIE&quot;)
+
+ssp = mylb.session_persistense()
+ssp.add(ss)
+</pre>
+<p>Get session persistense:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+ssp = mylb.session_persistense()
+print ssp.get()
+</pre>
+<p>Delete session persistense configuration:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+
+ssp = mylb.session_persistense()
+ssp.delete()
+</pre>
 </div>
 </div>
 </body>
