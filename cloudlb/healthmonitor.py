@@ -29,9 +29,10 @@ class HealthMonitorManager(object):
         ret = self.client.delete(self.path)
         return ret
 
+
 class HealthMonitor(SubResource):
     def __repr__(self):
-        return "<HealthMonitor: %s:%s>" % (self.type)
+        return "<HealthMonitor: %s>" % (self.type)
 
     def __init__(self, type=None,
                  delay=None,
@@ -40,7 +41,6 @@ class HealthMonitor(SubResource):
                  path=None,
                  statusRegex=None,
                  bodyRegex=None):
-        self._originalInfo = self.toDict(includeNone=True)
 
         self.type = type
         self.delay = delay
@@ -50,8 +50,7 @@ class HealthMonitor(SubResource):
         if not all([self.type, self.delay,
                     self.timeout, self.attemptsBeforeDeactivation]):
             #TODO: Proper Exceptions
-            raise Exception("You need to specify a" + \
-                                " type timeout and attte.")
+            raise Exception("You need to specify a timeout type and an attemptsBeforeDeactivation.")
 
         if not self.type in HEALTH_MONITOR_TYPES:
             raise Exception("%s is an invalid healthmonitor type" % (
