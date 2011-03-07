@@ -364,7 +364,7 @@ hm = cloudlb.healthmonitor.HealthMonitor(
 
 hm_monitor.add(hm)
 </pre>
-<p>Monitor loadbalancer using HTTP:</p>
+<p>Monitor loadbalancer using HTTP(s):</p>
 <pre class="literal-block">
 #!/usr/bin/python
 import cloudlb
@@ -375,7 +375,7 @@ mylb = lbs[0] #first lb
 
 hm_monitor = mylb.healthmonitor()
 hm = cloudlb.healthmonitor.HealthMonitor(
-    type=&quot;HTTP&quot;,
+    type=&quot;HTTP&quot;, #or HTTPS
     delay=10,
     timeout=10,
     attemptsBeforeDeactivation=3,

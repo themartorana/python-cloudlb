@@ -210,7 +210,7 @@ Monitor loadbalancer using simple TCP Connect::
   
   hm_monitor.add(hm)
 
-Monitor loadbalancer using HTTP::
+Monitor loadbalancer using HTTP(s)::
 
   #!/usr/bin/python
   import cloudlb
@@ -221,7 +221,7 @@ Monitor loadbalancer using HTTP::
 
   hm_monitor = mylb.healthmonitor()
   hm = cloudlb.healthmonitor.HealthMonitor(
-      type="HTTP",
+      type="HTTP", #or HTTPS
       delay=10,
       timeout=10,
       attemptsBeforeDeactivation=3,
