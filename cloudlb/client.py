@@ -77,7 +77,7 @@ class CLBClient(httplib2.Http):
             print "ARGS: %s" % (str(kwargs))
             if 'body' in kwargs:
                 from pprint import pprint as p
-                p(kwargs['body'])
+                p("BODY: %s" % kwargs['body'])
 
         response, body = self.request(fullurl, method, **kwargs)
 
