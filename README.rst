@@ -280,6 +280,24 @@ Delete session persistense configuration::
   ssp = mylb.session_persistense()
   ssp.delete()
 
+Enable/Disable Connection Logging::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+  cl = mylb.connection_logging()
+  
+  #Get connection logging status
+  print cl.get()
+
+  #Enable connection logging
+  cl.enable()
+  
+  #Disable connection logging
+  cl.disable()
 
 LICENSE
 =======

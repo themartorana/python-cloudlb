@@ -5,10 +5,11 @@ from cloudlb.consts import LB_PROTOCOLS, LB_ATTRIBUTES_MODIFIABLE
 from cloudlb.errors import InvalidProtocol, InvalidLoadBalancerName
 from cloudlb.node import Node, NodeDict
 from cloudlb.virtualip import VirtualIP
-from usage import get_usage
-from accesslist import AccessList
-from healthmonitor import HealthMonitorManager
-from sessionpersistense import SessionPersistenseManager
+from cloudlb.usage import get_usage
+from cloudlb.accesslist import AccessList
+from cloudlb.healthmonitor import HealthMonitorManager
+from cloudlb.sessionpersistense import SessionPersistenseManager
+from cloudlb.connectionlogging import ConnectionLoggingManager
 
 
 class LoadBalancer(base.Resource):
@@ -56,9 +57,14 @@ class LoadBalancer(base.Resource):
         return hm
 
     def session_persistense(self):
-        hm = SessionPersistenseManager(
+        sm = SessionPersistenseManager(
             self.manager.api.client, base.getid(self))
-        return hm
+        return sm
+
+    def connection_logging(self):
+        cm = ConnectionLoggingManager(
+            self.manager.api.client, base.getid(self))
+        return cm
 
 
 class LoadBalancerManager(base.ManagerWithFind):

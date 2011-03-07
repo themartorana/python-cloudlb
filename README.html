@@ -434,6 +434,33 @@ mylb = lbs[0] #first lb
 ssp = mylb.session_persistense()
 ssp.delete()
 </pre>
+<p>Enable/Disable Connection Logging:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+cl = mylb.connection_logging()
+
+#Get connection logging status
+print cl.get()
+
+#Enable connection logging
+cl.enable()
+
+#Disable connection logging
+cl.disable()
+</pre>
+</div>
+<div class="section" id="license">
+<h1>LICENSE</h1>
+<p>See COPYING for license information. Copyright © 2011, Rackspace US, Inc.</p>
+</div>
+<div class="section" id="author">
+<h1>Author</h1>
+<p>Chmouel Boudjnah &lt;<a class="reference external" href="mailto:chmouel&#64;chmouel.com">chmouel&#64;chmouel.com</a>&gt;</p>
 </div>
 </div>
 </body>
