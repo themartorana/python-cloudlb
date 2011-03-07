@@ -280,3 +280,14 @@ Delete session persistense configuration::
   ssp = mylb.session_persistense()
   ssp.delete()
 
+
+LICENSE
+=======
+
+See COPYING for license information. Copyright © 2011, Rackspace US, Inc.
+
+Author
+======
+
+Chmouel Boudjnah <chmouel@chmouel.com>
+
