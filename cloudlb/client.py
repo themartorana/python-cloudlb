@@ -75,6 +75,7 @@ class CLBClient(httplib2.Http):
         if 'PYTHON_CLOUDB_DEBUG' in os.environ:
             print "URL: %s" % (fullurl)
             print "ARGS: %s" % (str(kwargs))
+            print "METHOD: %s" % (str(method))
             if 'body' in kwargs:
                 from pprint import pprint as p
                 p("BODY: %s" % kwargs['body'])
