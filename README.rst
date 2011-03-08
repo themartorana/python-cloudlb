@@ -187,7 +187,7 @@ Get limits on all LoadBalancers::
   
   print clb.get_limits()
 
-Get algorithm supported::
+Get Load Balancing Algorithms::
 
   #!/usr/bin/python
   import cloudlb
