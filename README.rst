@@ -322,6 +322,35 @@ Enable/Disable Connection Logging::
   #Disable connection logging
   cl.disable()
 
+Access Lists::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  lbs = clb.loadbalancers.list()
+  mylb = lbs[0] #first lb
+  accesslist = mylb.accesslist()
+
+  networkItem1 = cloudlb.accesslist.NetworkItem(
+      address="10.20.30.40", type="ALLOW")
+
+  networkItem2 = cloudlb.accesslist.NetworkItem(
+      address="0.0.0.0/0", type="DENY")
+    
+  # Allow only 10.20.30.40
+  accesslist.add([networkItem1, networkItem2])
+
+  # List accesslists
+  print accesslist.list()
+
+  # Delete all accesslist
+  accesslist.delete()
+
+  # Delete accesslist by ID
+  accesslist.delete(id=62)  
+
+
 LICENSE
 =======
 

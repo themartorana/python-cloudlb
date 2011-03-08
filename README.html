@@ -476,6 +476,34 @@ cl.enable()
 #Disable connection logging
 cl.disable()
 </pre>
+<p>Access Lists:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+lbs = clb.loadbalancers.list()
+mylb = lbs[0] #first lb
+accesslist = mylb.accesslist()
+
+networkItem1 = cloudlb.accesslist.NetworkItem(
+    address=&quot;10.20.30.40&quot;, type=&quot;ALLOW&quot;)
+
+networkItem2 = cloudlb.accesslist.NetworkItem(
+    address=&quot;0.0.0.0/0&quot;, type=&quot;DENY&quot;)
+
+# Allow only 10.20.30.40
+accesslist.add([networkItem1, networkItem2])
+
+# List accesslists
+print accesslist.list()
+
+# Delete all accesslist
+accesslist.delete()
+
+# Delete accesslist by ID (TODO: Not working ATM)
+# accesslist.delete(id=62)
+</pre>
 </div>
 <div class="section" id="license">
 <h1>LICENSE</h1>
