@@ -10,6 +10,7 @@ from cloudlb.accesslist import AccessList
 from cloudlb.healthmonitor import HealthMonitorManager
 from cloudlb.sessionpersistense import SessionPersistenseManager
 from cloudlb.connectionlogging import ConnectionLoggingManager
+from cloudlb.connectionthrottle import ConnectionThrottleManager
 
 
 class LoadBalancer(base.Resource):
@@ -65,6 +66,13 @@ class LoadBalancer(base.Resource):
         cm = ConnectionLoggingManager(
             self.manager.api.client, base.getid(self))
         return cm
+
+    #TODO: Not working!
+    def connection_throttling(self):
+        ctm = ConnectionThrottleManager(
+            self.manager.api.client, base.getid(self),
+        )
+        return ctm
 
 
 class LoadBalancerManager(base.ManagerWithFind):
