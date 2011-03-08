@@ -2,7 +2,7 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 
 
-class ConnectionLoggingManager(object):
+class ConnectionLogging(object):
     type = "connectionLogging"
     path = None
 

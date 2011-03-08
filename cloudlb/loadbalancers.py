@@ -9,7 +9,7 @@ from cloudlb.usage import get_usage
 from cloudlb.accesslist import AccessList
 from cloudlb.healthmonitor import HealthMonitorManager
 from cloudlb.sessionpersistense import SessionPersistenseManager
-from cloudlb.connectionlogging import ConnectionLoggingManager
+from cloudlb.connectionlogging import ConnectionLogging
 from cloudlb.connectionthrottle import ConnectionThrottleManager
 
 
@@ -63,7 +63,7 @@ class LoadBalancer(base.Resource):
         return sm
 
     def connection_logging(self):
-        cm = ConnectionLoggingManager(
+        cm = ConnectionLogging(
             self.manager.api.client, base.getid(self))
         return cm
 
