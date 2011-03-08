@@ -3,10 +3,6 @@ __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 from cloudlb.base import SubResource, SubResourceManager
 
 
-class ConnectionThrottleManager(SubResourceManager):
-    type = "connectionThrottle"
-
-
 class ConnectionThrottle(SubResource):
     def __repr__(self):
         return "<ConnectionThrottle>" % (self.type)
@@ -26,3 +22,8 @@ class ConnectionThrottle(SubResource):
                     rateInterval, maxConnectionRate]):
             #TODO:
             raise Exception("missing some parameters")
+
+
+class ConnectionThrottleManager(SubResourceManager):
+    type = "connectionThrottle"
+    resource = ConnectionThrottle

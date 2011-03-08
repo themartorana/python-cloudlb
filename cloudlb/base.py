@@ -113,6 +113,7 @@ class ManagerWithFind(Manager):
 class SubResourceManager(object):
     path = None
     type = None
+    resource = None
 
     def __init__(self, client, lbId=None):
         self.lbId = lbId
@@ -124,7 +125,7 @@ class SubResourceManager(object):
 
     def get(self):
         ret = self.client.get("%s.json" % self.path)
-        return ret[1][self.type]
+        return self.resource(**(ret[1][self.type]))
 
     def add(self, ssp):
         dico = ssp.toDict()

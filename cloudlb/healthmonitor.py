@@ -4,11 +4,6 @@ from cloudlb.base import SubResource, SubResourceManager
 from cloudlb.consts import HEALTH_MONITOR_TYPES
 
 
-class HealthMonitorManager(SubResourceManager):
-    path = None
-    type = "healthMonitor"
-
-
 class HealthMonitor(SubResource):
     def __repr__(self):
         return "<HealthMonitor: %s>" % (self.type)
@@ -45,3 +40,9 @@ class HealthMonitor(SubResource):
             if not all([path, statusRegex, bodyRegex]):
                 raise Exception("You need to specify a path statusregexp " +
                                 "and bodyregexp with HTTP(S) monitor")
+
+
+class HealthMonitorManager(SubResourceManager):
+    path = None
+    type = "healthMonitor"
+    resource = HealthMonitor
