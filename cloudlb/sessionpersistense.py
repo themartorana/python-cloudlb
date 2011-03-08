@@ -4,14 +4,9 @@ from cloudlb.base import SubResource, SubResourceManager
 from cloudlb.consts import SESSION_PERSISTENSE_TYPES
 
 
-class SessionPersistenseManager(SubResourceManager):
-    path = None
-    type = "sessionPersistence"
-
-
 class SessionPersistense(SubResource):
     def __repr__(self):
-        return "<SessionPersistense: %s>" % (self.type)
+        return "<SessionPersistense: %s>" % (self.persistenceType)
 
     def __init__(self, persistenceType=None):
         self.persistenceType = persistenceType
@@ -22,3 +17,9 @@ class SessionPersistense(SubResource):
         if not self.persistenceType in SESSION_PERSISTENSE_TYPES:
             raise Exception("%s is an invalid session persistense type" % (
                     self.type))
+
+
+class SessionPersistenseManager(SubResourceManager):
+    path = None
+    type = "sessionPersistence"
+    resource = SessionPersistense
