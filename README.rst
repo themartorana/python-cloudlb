@@ -187,6 +187,14 @@ Get limits on all LoadBalancers::
   
   print clb.get_limits()
 
+Get algorithm supported::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  print clb.get_algorithms()
+
 Get current Health Monitor::
 
   #!/usr/bin/python
