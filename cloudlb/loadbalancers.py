@@ -42,7 +42,7 @@ class LoadBalancer(base.Resource):
     def update(self):
         self.manager.update(self, self._info, self.__dict__)
 
-    def usage(self, startTime=None, endTime=None):
+    def get_usage(self, startTime=None, endTime=None):
         startTime = startTime and startTime.isoformat()
         endTime = endTime and endTime.isoformat()
         ret = get_usage(self.manager.api.client, lbId=base.getid(self),

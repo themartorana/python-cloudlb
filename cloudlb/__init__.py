@@ -30,7 +30,9 @@ class CloudLoadBalancer(object):
         return ret
 
     def get_limits(self):
-        return self.client.get("/loadbalancers/limits")[1]['limits']
+        #TODO: Work alternatively, probably backend problem one of the
+        #nodes return 500 when listing limits.
+        return self.client.get("/loadbalancers/limits")[1]['limits']['rate'][0]
 
     def authenticate(self):
         """

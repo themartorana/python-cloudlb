@@ -320,8 +320,7 @@ mylb.update()
 import cloudlb
 clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
 
-lbs = clb
-print clb.usage()
+print clb.get_usage()
 </pre>
 <p>Get usage statitiscs on a specfic LoadBalancer:</p>
 <pre class="literal-block">
@@ -332,7 +331,15 @@ clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;c
 lbs = clb.loadbalancers.list()
 mylb = lbs[0] #first lb
 
-print mylb.usage()
+print mylb.get_usage()
+</pre>
+<p>Get limits on all LoadBalancers:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+print clb.get_limits()
 </pre>
 <p>Get current Health Monitor:</p>
 <pre class="literal-block">

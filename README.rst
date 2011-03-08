@@ -166,8 +166,7 @@ Get usage statitiscs on all LoadBalancers::
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
   
-  lbs = clb
-  print clb.usage()
+  print clb.get_usage()
 
 Get usage statitiscs on a specfic LoadBalancer::
 
@@ -178,7 +177,15 @@ Get usage statitiscs on a specfic LoadBalancer::
   lbs = clb.loadbalancers.list()
   mylb = lbs[0] #first lb
 
-  print mylb.usage()
+  print mylb.get_usage()
+
+Get limits on all LoadBalancers::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  print clb.get_limits()
 
 Get current Health Monitor::
 
