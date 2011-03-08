@@ -23,13 +23,13 @@ class CloudLoadBalancer(object):
                                 **kwargs)
         self.loadbalancers = LoadBalancerManager(self)
 
-    def usage(self, startTime=None, endTime=None):
+    def get_usage(self, startTime=None, endTime=None):
         startTime = startTime and startTime.isoformat()
         endTime = endTime and endTime.isoformat()
         ret = get_usage(self.client, startTime=startTime, endTime=endTime)
         return ret
 
-    def show_limits(self):
+    def get_limits(self):
         return self.client.get("/loadbalancers/limits")[1]['limits']
 
     def authenticate(self):
