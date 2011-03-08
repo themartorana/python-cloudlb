@@ -195,6 +195,14 @@ Get Load Balancing Algorithms::
   
   print clb.get_algorithms()
 
+Get Load Balancing Protocols::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+  
+  print clb.get_protocols()
+
 Get current Health Monitor::
 
   #!/usr/bin/python

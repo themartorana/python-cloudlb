@@ -38,6 +38,10 @@ class CloudLoadBalancer(object):
         g = self.client.get("/loadbalancers/algorithms")[1]['algorithms']
         return [x['name'] for x in g]
 
+    def get_protocols(self):
+        g = self.client.get("/loadbalancers/protocols")[1]['protocols']
+        return [x['name'] for x in g]
+
     def authenticate(self):
         """
         Authenticate against the server.

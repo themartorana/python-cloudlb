@@ -341,13 +341,21 @@ clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;c
 
 print clb.get_limits()
 </pre>
-<p>Get algorithm supported:</p>
+<p>Get Load Balancing Algorithms:</p>
 <pre class="literal-block">
 #!/usr/bin/python
 import cloudlb
 clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
 
 print clb.get_algorithms()
+</pre>
+<p>Get Load Balancing Protocols:</p>
+<pre class="literal-block">
+#!/usr/bin/python
+import cloudlb
+clb = cloudlb.CloudLoadBalancer(&quot;username&quot;, &quot;apikey&quot;,&quot;chicago&quot;)
+
+print clb.get_protocols()
 </pre>
 <p>Get current Health Monitor:</p>
 <pre class="literal-block">
