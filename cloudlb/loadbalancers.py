@@ -32,7 +32,7 @@ class LoadBalancer(base.Resource):
                 v = [VirtualIP(parent=self, **x) for x in v]
 
             if k in ('created', 'updated'):
-                v['time'] = base.convert_iso_datetime(v['time'])
+                v = base.convert_iso_datetime(v['time'])
 
             setattr(self, k, v)
 
