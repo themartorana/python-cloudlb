@@ -110,8 +110,7 @@ class LoadBalancerManager(base.ManagerWithFind):
                  if x._info['status'] == "DELETED"]
 
     def create(self, name, port,
-               protocol, nodes, virtualIps,
-               ipgroup=None, meta=None, files=None):
+               protocol, nodes, virtualIps):
         """
         Create a new loadbalancer.
 
@@ -124,7 +123,6 @@ class LoadBalancerManager(base.ManagerWithFind):
 
         nodeDico = [x.toDict() for x in nodes]
         vipDico = [x.toDict() for x in virtualIps]
-        print nodeDico
 
         if len(name) > 128:
             raise InvalidLoadBalancerName("LB name is too long.")

@@ -31,7 +31,6 @@ def get_usage(client, lbId=None, startTime=None, endTime=None):
     ret = ret['loadBalancerUsageRecords']
     alist = []
     for row in ret:
-        print row
         row['startTime'] = base.convert_iso_datetime(row['startTime'])
         row['endTime'] = base.convert_iso_datetime(row['endTime'])
         alist.append(row)
