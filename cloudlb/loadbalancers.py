@@ -28,6 +28,12 @@ class LoadBalancer(base.Resource):
             if k == "nodes":
                 v = NodeDict([Node(parent=self, **x) for x in v])
 
+            if k == "sessionPersistence":
+                v = v['persistenceType']
+
+            if k == "cluster":
+                v = v['name']
+
             if k == "virtualIps":
                 v = [VirtualIP(parent=self, **x) for x in v]
 
