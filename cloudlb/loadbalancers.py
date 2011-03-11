@@ -66,6 +66,16 @@ class LoadBalancer(base.Resource):
         cm = ConnectionLogging(
             self.manager.api.client, base.getid(self))
         return cm
+        
+    def virtual_ips(self):
+        vips = self._info.get('virtualIps', None)
+        if vips:
+            return [VirtualIP(
+                id=vip['id'],
+                address=vip['address'],
+                ipVersion=vip['ipVersion'],
+                type=vip['type']
+            ) for vip in vips]
 
     #TODO: Not working!
     def connection_throttling(self):
