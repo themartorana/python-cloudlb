@@ -133,8 +133,9 @@ class LoadBalancerManager(base.ManagerWithFind):
                                       (protocol))
 
         nodeDico = [x.toDict() for x in nodes]
-        vipDico = [x.toDict() for x in virtualIps]
-        print nodeDico
+        vipDico = [{ 'id': x.id } if getattr(x, 'id', None) != None else { 'type': x.type } for x in virtualIps]
+        # print vipDico
+        # print nodeDico
 
         if len(name) > 128:
             raise InvalidLoadBalancerName("LB name is too long.")
@@ -174,7 +175,7 @@ class LoadBalancerManager(base.ManagerWithFind):
                 base.getid(loadBalancerId),
                 base.getid(nodeId),
                 ), body={"node": dico})
-
+    
     def update(self, lb, originalInfo, info):
         ret = {}
         for k in LB_ATTRIBUTES_MODIFIABLE:
