@@ -8,7 +8,7 @@ from cloudlb.virtualip import VirtualIP
 from cloudlb.usage import get_usage
 from cloudlb.accesslist import AccessList
 from cloudlb.healthmonitor import HealthMonitorManager
-from cloudlb.sessionpersistense import SessionPersistenseManager
+from cloudlb.sessionpersistence import SessionPersistenceManager
 from cloudlb.connectionlogging import ConnectionLogging
 from cloudlb.connectionthrottle import ConnectionThrottleManager
 
@@ -63,8 +63,8 @@ class LoadBalancer(base.Resource):
         hm = HealthMonitorManager(self.manager.api.client, base.getid(self))
         return hm
 
-    def session_persistense(self):
-        sm = SessionPersistenseManager(
+    def session_persistence(self):
+        sm = SessionPersistenceManager(
             self.manager.api.client, base.getid(self))
         return sm
 
