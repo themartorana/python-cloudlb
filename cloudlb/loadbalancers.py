@@ -14,6 +14,8 @@ from cloudlb.connectionthrottle import ConnectionThrottleManager
 
 
 class LoadBalancer(base.Resource):
+    accessList = None
+
     def __repr__(self):
         return "<LoadBalancer: %s>" % self.name
 
