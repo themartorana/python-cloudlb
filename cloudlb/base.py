@@ -125,7 +125,9 @@ class SubResourceManager(object):
 
     def get(self):
         ret = self.client.get("%s.json" % self.path)
-        return self.resource(**(ret[1][self.type]))
+        tt = ret[1][self.type]
+        if tt:
+            return self.resource(**(tt))
 
     def add(self, ssp):
         dico = ssp.toDict()
