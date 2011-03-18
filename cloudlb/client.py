@@ -2,6 +2,7 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 import httplib2
 import os
+import sys
 import json
 
 import cloudlb.consts
@@ -73,12 +74,13 @@ class CLBClient(httplib2.Http):
 
         #DEBUGGING:
         if 'PYTHON_CLOUDB_DEBUG' in os.environ:
-            print "URL: %s" % (fullurl)
-            print "ARGS: %s" % (str(kwargs))
-            print "METHOD: %s" % (str(method))
+            sys.stderr.write("URL: %s" % (fullurl))
+            sys.stderr.write("ARGS: %s" % (str(kwargs)))
+            sys.stderr.write("METHOD: %s" % (str(method)))
             if 'body' in kwargs:
                 from pprint import pprint as p
-                p("BODY: %s" % kwargs['body'])
+                p("BODY: %s" % kwargs['body'],
+                  stream=sys.stderr)
 
         response, body = self.request(fullurl, method, **kwargs)
 
