@@ -24,7 +24,8 @@ class HealthMonitor(SubResource):
         if not all([self.type, self.delay,
                     self.timeout, self.attemptsBeforeDeactivation]):
             #TODO: Proper Exceptions
-            raise Exception("You need to specify a timeout type and an attemptsBeforeDeactivation.")
+            raise Exception("You need to specify a timeout type" + \
+                            " and an attemptsBeforeDeactivation.")
 
         if not self.type in HEALTH_MONITOR_TYPES:
             raise Exception("%s is an invalid healthmonitor type" % (
