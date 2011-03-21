@@ -41,6 +41,9 @@ class Resource(object):
             return self.id == other.id
         return self._info == other._info
 
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
 
 class Manager(object):
     """ Managers interact with a particular type of API (loadbalancer,
@@ -151,6 +154,9 @@ class SubResource(object):
             if not attr.startswith("_"):
                 ret[attr] = self.__dict__[attr]
         return ret
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
 
 class SubResourceDict(object):
