@@ -9,10 +9,30 @@ class NodeDict(SubResourceDict):
             if d.id == nodeId:
                 return d
 
+    def filter(self,
+               id=None,
+               condition=None,
+               address=None,
+               port=None,
+               status=None):
+        ret = []
+        for d in self.dico:
+            if condition and d.condition.lower() == condition.lower():
+                ret.append(d)
+            if address and d.address.lower() == address.lower():
+                ret.append(d)
+            if id and int(id) == int(id):
+                ret.append(d)
+            if port and int(d.port) == int(port):
+                ret.append(d)
+            if status and d.status.lower() == status.lower():
+                ret.append(d)
+        return ret
+
 
 class Node(SubResource):
     def __repr__(self):
-        return "<Node: %s:%s>" % (self.address, self.port)
+        return "<Node: %s:%s:%s>" % (self.id, self.address, self.port)
 
     def __init__(self,
                  weight=None,
