@@ -1,0 +1,769 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+__author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
+
+import sys
+import os
+import optparse
+import cloudlb
+
+
+class CLBCli(object):
+    username = None
+    api_key = None
+    location = None
+
+    def __init__(self):
+        self.username = os.environ.get('UK_RCLOUD_USER')
+        self.api_key = os.environ.get('UK_RCLOUD_KEY')
+        self.location = os.environ.get('UK_RCLOUD_LOCATION')
+        self.options = None
+        self.cnx = None
+
+    def _se(self, s):
+        sys.stderr.write("%s\n" % (s))
+
+    def _parse_variables_args(self, allowed_variables, other_args, strict=False):
+        config = {}
+        for arg in other_args:
+            if not '=' in arg:
+                self._se("'%s' is an invalid variable" % (arg))
+                sys.exit(1)
+
+            key, value = arg.split('=')
+            if not key in allowed_variables:
+                self._se("'%s' is an invalid type of variable" % (key))
+                sys.exit(1)
+            config[key] = value
+
+        if strict and \
+                sorted(config.keys()) != sorted(allowed_variables):
+            self._se("You don't have enough arguments specified'")
+            sys.exit(1)
+        return config
+        
+    def _get_loadbalancer(self, loadbalancer):
+        self._get_connexion()
+        loadbalancer = int(loadbalancer)
+
+        try:
+            loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
+        except cloudlb.errors.ResponseError, x:
+            if str(x).startswith('404'):
+                self._se("You have specified an invalid load balancer ID.")
+                sys.exit(1)
+            else:
+                raise
+        return loadbalancer
+
+    def _get_connexion(self):
+        if not self.cnx:
+            self.cnx = cloudlb.CloudLoadBalancer(
+                self.username, self.api_key, self.location,
+            )
+
+    def _check_lb_arg(self, args):
+        if len(args) == 1:
+            self._se("We need a load balancer ID as argument.")
+            sys.exit(1)
+
+    #LIST
+    def list_loadbalancers(self, args):
+        self._get_connexion()
+
+        if len(args) >= 1:
+            if args[0] == "deleted":
+                lbs = self.cnx.loadbalancers.list_deleted()
+        else:
+            lbs = self.cnx.loadbalancers.list()
+
+        for lb in lbs:
+            pvip = []
+            try:
+                for ip in lb.virtualIps:
+                    pvip.append("%s" % (ip.address))
+            except(AttributeError):
+                pass
+            print "%s:%s:%s:%s" % (lb.id, lb.name, "/".join(pvip), lb.status)
+
+    def list_nodes(self, args):
+        loadbalancer=args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        nodes = loadbalancer.nodes
+
+        if len(args) == 1:
+            self._format_nodes(nodes)
+            return
+        
+        allowed_variables = ['condition', 'port', 'address', 'status', 'id']
+        config = self._parse_variables_args(allowed_variables, args[1:])
+        self._format_nodes(nodes.filter(**config))
+
+    def delete_node(self, args):
+        if len(args) != 2:
+            self._se("We need as argument a loadBalancerId and nodeId")
+            sys.exit(1)
+
+        loadbalancer, nodeId = args
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        if not nodeId.isdigit():
+            self._se("%s is not a Node ID" % (nodeId))
+            sys.exit(1)
+
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        nodeId = int(nodeId)
+        node = loadbalancer.nodes.get(nodeId)
+        node.delete()
+        
+    #DELETE
+    def delete_loadbalancer(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+
+        if loadbalancer.status == "DELETED":
+            self._se("Loadbalancer %s is already deleted." % \
+                (loadbalancer.id))
+            sys.exit(1)
+
+        try:
+            loadbalancer.delete()
+        except cloudlb.errors.ResponseError:
+                raise
+
+        print "DONE: Request to delete loadbalancer %s:%s has been sent." % \
+            (loadbalancer.id, loadbalancer.name)
+
+    def delete_accesslist(self, args):
+        if len(args) != 2:
+            self._se("We need as argument a loadBalancerId and a accessListID")
+            sys.exit(1)
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        accessListID = args[1]
+
+        if accessListID == "all":
+            accessListID = None
+        else:
+            if not accessListID.isdigit():
+                self._se("%s is not an access list ID" % (accessListID))
+                sys.exit(1)
+            accessListID = int(accessListID)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        accesslist = loadbalancer.accesslist()
+        try:
+            accesslist.delete(id=accessListID)
+        except cloudlb.errors.ResponseError, x:
+            if str(x).startswith('422'):
+                print "No access lists to delete."
+                sys.exit(0)
+
+        if not accessListID:
+            print "all access lists has been deleted"
+        else:
+            print "access lists rules %s deleted." % (accessListID)
+
+    def delete_session_persistence(self, loadBalancerId):
+        if not loadBalancerId.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadBalancerId))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadBalancerId)
+        ssp = loadbalancer.session_persistence()
+        ssp.delete()
+
+    def delete_healthmonitor(self, loadBalancerId):
+        if not loadBalancerId.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadBalancerId))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadBalancerId)
+        hm = loadbalancer.healthmonitor()
+        hm.delete()
+        
+    #SHOW
+    def show_limits(self):
+        #TODO: 501 on the other LB (Round Robin)
+        self._get_connexion()
+        ret = self.cnx.get_limits()
+        print 'Regexp: "%s"' % (ret['regex'])
+        print 'URI: "%s"' % (ret['uri'])
+        print "Limits"
+        for verb in ret['limit']:
+            print "  %s: Limit %s/%s Remaining: %s, Next-Available: %s" % \
+                (verb['verb'],
+                 verb['value'],
+                 verb['unit'].lower()[:3],
+                 verb['remaining'],
+                 cloudlb.base.convert_iso_datetime(verb['next-available']))
+
+    #TODO: Make it pretty this is basically a json dump.
+    def show_usage(self, args=None):
+        if args and len(args) == 1:
+            loadbalancer = args[0]
+            if not loadbalancer.isdigit():
+                self._se("%s is not a Load Balancer ID" % (loadbalancer))
+                sys.exit(1)
+            loadbalancer = self._get_loadbalancer(loadbalancer)
+            ret = loadbalancer.get_usage()
+        else:
+            self._get_connexion()
+            ret = self.cnx.get_usage()
+
+        from pprint import pprint as p
+        p(ret)
+
+    def show_algorithms(self):
+        self._get_connexion()
+        ret = self.cnx.get_algorithms()
+        ret.sort()
+        print "LoadBalancer Algorithms available: "
+        for algo in ret:
+            print "  %s" % (algo)
+
+    def show_node(self, args):
+        if len(args) != 2:
+            self._se("We need as argument a loadBalancerId and nodeId")
+            sys.exit(1)
+
+        loadbalancer, nodeId = args
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        if not nodeId.isdigit():
+            self._se("%s is not a Node ID" % (nodeId))
+            sys.exit(1)
+
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        nodeId = int(nodeId)
+        node = loadbalancer.nodes.get(nodeId)
+        if not node:
+            self._se("%s is an invalid node" % (nodeId))
+            sys.exit(1)
+
+        print "Node %s: " % (nodeId)
+        print "  Address: %s" % node.address
+        print "  Weight: %s" % node.weight
+        print "  Port: %s" % node.port
+        print "  Condition: %s" % node.condition
+        print "  Status: %s" % node.status
+
+    def show_persistence(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        session_persistence = loadbalancer.session_persistence()
+        sspt = session_persistence.get()
+        if not sspt:
+            s = "None"
+        else:
+            s = sspt.persistenceType
+        print "Session Persistence Type: %s" % s
+
+    def show_connection_logging(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        print "Connection Logging: %s" % \
+            (loadbalancer.connection_logging().get() \
+                 and "Enabled" or "Disabled")
+
+    def list_accesslists(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+
+        accesslist = loadbalancer.accessList
+        if not accesslist:
+            sys.exit(0)
+        for acl in accesslist:
+            print "Type: %s, Address: %s, ID: %s" % (acl['type'],
+                                                     acl['address'],
+                                                     acl['id'])
+
+    def show_healthmonitor(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+
+        hm_monitor = loadbalancer.healthmonitor()
+        hm = hm_monitor.get()
+        print "HealthMonitor:"
+        print "  Type: %s" % (hm.type)
+        print "  Delay: %s" % (hm.delay)
+        print "  Timeout: %s" % (hm.timeout)
+        print "  AttemptsBeforeDeactivation: %s" % \
+            (hm.attemptsBeforeDeactivation)
+
+    def show_protocols(self):
+        self._get_connexion()
+        ret = self.cnx.get_protocols()
+        ret.sort()
+        print "Protocols Available: "
+        for algo in ret:
+            print "  %s" % (algo)
+
+    def show_loadbalancer(self, loadbalancer):
+        if not loadbalancer.isdigit():
+            print "%s is not a Load Balancer ID" % (loadbalancer)
+            sys.exit(1)
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+
+        print "Name: %s" % (loadbalancer.name)
+        print "Status: %s" % (loadbalancer.status)
+        if not loadbalancer.status == "DELETED":
+            print "Port: %s" % (loadbalancer.port)
+            print "Protocol: %s" % (loadbalancer.protocol)
+        print "ID: %s" % (loadbalancer.id)
+        print "Created: %s" % (loadbalancer.created)
+        print "Updated: %s" % (loadbalancer.updated)
+        print "Status: %s" % (loadbalancer.status)
+        #TODO: Connection Throthling
+        if loadbalancer.status == "DELETED":
+            return
+
+        if loadbalancer.sessionPersistence:
+            print "Session Persistence: %s" % (loadbalancer.sessionPersistence)
+        print "LB Algorithm: %s" % (loadbalancer.algorithm)
+        print "LB Cluster: %s" % (loadbalancer.cluster)
+        print "Logging: %s" % (loadbalancer.connection_logging().get() \
+                                   and "Enabled" or "Disabled")
+        if loadbalancer.healthMonitor:
+            print "Health monitor:"
+            print "  Type: %s" % \
+                (loadbalancer.healthMonitor['type'])
+            print "  Attempt before deactivation: %s" % \
+                (loadbalancer.healthMonitor['attemptsBeforeDeactivation'])
+            print "  Delay: %s" % \
+                (loadbalancer.healthMonitor['delay'])
+            print "  Timeout: %s" % \
+                (loadbalancer.healthMonitor['timeout'])
+
+        if loadbalancer.accessList:
+            print "Access List: "
+            for acl in loadbalancer.accessList:
+                print "  %s:%s:%s" % (acl['type'], acl['address'], acl['id'])
+
+        print "Virtual IP: "
+        virtualIps = loadbalancer.virtualIps
+        for vip in virtualIps:
+            print "  Address: %s, IPVersion: %s, Type: %s" % \
+                (vip.address, vip.ipVersion, vip.type)
+
+        print "Nodes: "
+        nodes = loadbalancer.nodes
+        self._format_nodes(nodes, padding='  ')
+        
+    def _format_nodes(self, nodes, padding=''):
+        for node in nodes:
+            nw = node.weight and node.weight or "0"
+            st = "%sID: %s, Address: %s, Port: %s, Status: %s, Weight: %s, Condition: %s"
+            print  st % (padding,
+                         node.id,
+                         node.address,
+                         node.port,
+                         node.status, nw,
+                         node.condition)
+
+    #ADD
+    def add_accesslist(self, args):
+        if len(args) != 2:
+            self._se("We need as argument a loadBalancerId and a accessList rule")
+            sys.exit(1)
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+
+        #TODO: IPV6
+        ruleArg = args[1]
+        if not ':' in ruleArg:
+            self._se("Invalid format for accessList rule," + \
+                " format is: RULE_TYPE:ADDRESS")
+            self._se("when RULE_TYPE can be ALLOW or DENY " + \
+            " and ADDRESS can be like " + \
+            "0.0.0.0/0 or without network like 10.1.2.3")
+            sys.exit(1)
+
+        (type, address) = ruleArg.split(':')
+        if type not in ('DENY', 'ALLOW'):
+            self._se("RULE_TYPE can be only ALLOW or DENY not %s " % type)
+            sys.exit(1)
+
+        nItem = cloudlb.accesslist.NetworkItem(address=address, type=type)
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        accesslist = loadbalancer.accesslist()
+        try:
+            accesslist.add([nItem])
+        except cloudlb.errors.ResponseError, x:
+            if str(x).startswith('400'):
+                self._se("There was an error when adding rule," + \
+                    " probably because" + \
+                    " wrong address or rules already exist.")
+                sys.exit(1)
+            else:
+                raise
+        print "Accesslist Rules %s added." % (ruleArg)
+
+    def add_node(self, args):
+        loadbalancerId = args[0]
+        if not loadbalancerId.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancerId))
+            sys.exit(1)
+        allowed_variables = ['condition', 'port', 'address', 'status']
+        config = self._parse_variables_args(allowed_variables, args[1:])
+        if not config:
+            return
+        node = cloudlb.node.Node(**config)
+        loadbalancer = self._get_loadbalancer(loadbalancerId)
+        loadbalancer.add_nodes([node])
+        
+    #SET
+    def set_session_persistence(self, args):
+        from cloudlb.consts import SESSION_PERSISTENCE_TYPES
+
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        session_persistence_type = args[1]
+        if not session_persistence_type in SESSION_PERSISTENCE_TYPES:
+            self._se("'%s' is not a session persistence type allowed: %s" % \
+                (session_persistence_type,
+                 ", ".join(SESSION_PERSISTENCE_TYPES)))
+            sys.exit(1)
+
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        ss = cloudlb.sessionpersistence.SessionPersistence(
+            persistenceType="HTTP_COOKIE")
+        ssp = loadbalancer.session_persistence()
+        ssp.add(ss)
+
+    def set_connection_logging(self, args):
+        enable = False
+        if len(args) != 2:
+            self._se("We need as argument a loadBalancerId" + \
+                " and enable or disable (or 0 1)")
+            sys.exit(1)
+
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        enable_disable = args[1]
+
+        if enable_disable.isdigit():
+            if int(enable_disable) == 0:
+                enable = False
+            elif int(enable_disable) == 1:
+                enable = True
+            else:
+                self._se("%s is an invalid argument" % (enable_disable))
+                sys.exit(1)
+        elif enable_disable.lower() == "enable":
+            enable = True
+        elif enable_disable.lower() == "disable":
+            enable = False
+        else:
+            self._se("%s is an invalid argument" % (enable_disable))
+            sys.exit(1)
+
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        cl = loadbalancer.connection_logging()
+        if enable:
+            print "Connectiong Logging Enabled"
+            cl.enable()
+        else:
+            print "Connectiong Logging Disabled"
+            cl.disable()
+
+    def set_node(self, args):
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        if not args[1:]:
+            self._se("you need to specify a node ID")
+            sys.exit(1)
+        nodeId = args[1]
+        if not nodeId.isdigit():
+            self._se("%s is not a Node ID" % (nodeId))
+            sys.exit(1)
+        else:
+            nodeId = int(nodeId)
+        allowed_variables = ['weight', 'condition']
+        config = self._parse_variables_args(allowed_variables, args[2:])
+        if not config:
+            return
+        #TODO: Check condition ['ENABLED', 'DISABLED', 'DRAINING']
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        node = loadbalancer.nodes.get(nodeId)
+        for t in config:
+            node[t] = config[t]
+        node.update()
+        
+    def set_loadbalancer(self, args):
+        from cloudlb.consts import LB_ATTRIBUTES_MODIFIABLE, LB_PROTOCOLS
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+        config = self._parse_variables_args(LB_ATTRIBUTES_MODIFIABLE, args[1:])
+        if not config:
+            return
+        if 'type' in config and \
+                config['type'] not in LB_PROTOCOLS:
+            self._se("%s is not a valid protocol")
+            sys.exit(1)
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        
+        for t in config:
+            loadbalancer[t] = config[t]
+        loadbalancer.update()
+        
+    def set_healthmonitor(self, args):
+        from cloudlb.consts import HEALTH_MONITOR_TYPES
+
+        loadbalancer = args[0]
+        if not loadbalancer.isdigit():
+            self._se("%s is not a Load Balancer ID" % (loadbalancer))
+            sys.exit(1)
+
+        allowed_variables = [
+            "type",
+            "delay",
+            "timeout",
+            "attemptsBeforeDeactivation",
+            "path",
+            "statusRegex",
+            "bodyRegex"]
+        
+        config = self._parse_variables_args(allowed_variables, args[1:])
+        if not config:
+            return
+        if not config['type'] in HEALTH_MONITOR_TYPES:
+            self._se("%s is an invalid health monitor type!")
+            sys.exit(1)
+
+        if config['type'] in ("HTTP", "HTTPS") and \
+                not all(['path' in config,
+                         'statusRegex' in config,
+                         'bodyRegex' in config]):
+                self._se("You are missing some arguments for %s healthMonitor" % config['type'])
+                sys.exit(1)
+            
+        self._get_connexion()
+        loadbalancer = self._get_loadbalancer(loadbalancer)
+        hm_monitor = loadbalancer.healthmonitor()
+        hm = cloudlb.healthmonitor.HealthMonitor(**config)
+        hm_monitor.add(hm)
+
+    #Parse
+    def parse_list(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what you want to list.")
+            sys.exit(1)
+
+        first_arg = args[0]
+
+        if first_arg == "loadbalancers":
+            self.list_loadbalancers(args[1:])
+        elif first_arg == "access_lists":
+            self._check_lb_arg(args)
+            #TODO: Filter!
+            self.list_accesslists(args[1])
+        elif first_arg == "nodes":
+            if len(args) == 1:
+                self._se("We need a load balancer ID as argument.")
+                sys.exit(1)
+            self.list_nodes(args[1:])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    def parse_delete(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what you want to delete.")
+            sys.exit(1)
+
+        first_arg = args[0]
+        if first_arg == "loadbalancer":
+            self._check_lb_arg(args)
+            self.delete_loadbalancer(args[1])
+        if first_arg == "node":
+            self._check_lb_arg(args)
+            self.delete_node(args[1:])
+        elif first_arg == "access_list":
+            self._check_lb_arg(args)
+            self.delete_accesslist(args[1:])
+        elif first_arg == "session_persistence":
+            self._check_lb_arg(args)
+            self.delete_session_persistence(args[1])
+        elif first_arg == "healthmonitor":
+            self._check_lb_arg(args)
+            self.delete_healthmonitor(args[1])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    def parse_set(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what do you want to show.")
+            sys.exit(1)
+
+        first_arg = args[0]
+
+        if first_arg == "connection_logging":
+            self._check_lb_arg(args)
+            self.set_connection_logging(args[1:])
+        elif first_arg == "session_persistence":
+            self._check_lb_arg(args)
+            self.set_session_persistence(args[1:])
+        elif first_arg == "healthmonitor":
+            self._check_lb_arg(args)
+            self.set_healthmonitor(args[1:])
+        elif first_arg == "loadbalancer":
+            self._check_lb_arg(args)
+            self.set_loadbalancer(args[1:])
+        elif first_arg == "node":
+            self._check_lb_arg(args)
+            self.set_node(args[1:])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    def parse_add(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what do you want to add.")
+            sys.exit(1)
+
+        first_arg = args[0]
+
+        if first_arg == "access_list":
+            self._check_lb_arg(args)
+            self.add_accesslist(args[1:])
+        elif first_arg == "node":
+            self._check_lb_arg(args)
+            self.add_node(args[1:])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    def parse_show(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what do you want to show.")
+            sys.exit(1)
+
+        first_arg = args[0]
+
+        if first_arg == "limits":
+            self.show_limits()
+        elif first_arg == "usage":
+            self.show_usage(args[1:])
+        elif first_arg == "algorithms":
+            self.show_algorithms()
+        elif first_arg == "protocols":
+            self.show_protocols()
+        elif first_arg == "healthmonitor":
+            self._check_lb_arg(args)
+            self.show_healthmonitor(args[1])
+        elif first_arg == "session_persistence":
+            self._check_lb_arg(args)
+            self.show_persistence(args[1])
+        elif first_arg == "connection_logging":
+            self._check_lb_arg(args)
+            self.show_connection_logging(args[1])
+        elif first_arg == "loadbalancer":
+            self._check_lb_arg(args)
+            self.show_loadbalancer(args[1])
+        elif first_arg == "access_lists":
+            self._check_lb_arg(args)
+            self.list_accesslists(args[1])
+        elif first_arg == "node":
+            self._check_lb_arg(args)
+            self.show_node(args[1:])
+        elif first_arg == "nodes":
+            self._check_lb_arg(args)
+            self.list_nodes(args[1:])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    def parse_args(self, args=None):
+        if not args:
+            args = sys.argv
+        opparser = optparse.OptionParser(usage="TODO!")
+        opparser.add_option('-u', '--username',
+                            type='string',
+                            help="Rackspace Cloud Username")
+        opparser.add_option('-k', '--api-key',
+                            dest='api_key',
+                            type='string',
+                            help="Rackspace Cloud API Key")
+        opparser.add_option('-l', '--location',
+                            type='string',
+                            help="Rackspace Cloud Location")
+        (options, args) = opparser.parse_args(args)
+        return (options, args)
+
+    def parse_syntax(self, args=None):
+        if not args[1:]:
+            #TODO: Help
+            self._se("I need arguments!")
+            sys.exit(1)
+
+        first_arg = args[1]
+        rest = args[2:]
+
+        if first_arg == "list":
+            self.parse_list(rest)
+        elif first_arg == "delete":
+            self.parse_delete(rest)
+        elif first_arg == "info":
+            self.parse_info(rest)
+        elif first_arg == "show":
+            self.parse_show(rest)
+        elif first_arg == "set":
+            self.parse_set(rest)
+        elif first_arg == "add":
+            self.parse_add(rest)
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
+    #MAIN
+    def main(self):
+        (self.options, args) = self.parse_args()
+        if self.options.username:
+            self.username = self.options.username
+        if self.options.api_key:
+            self.api_key = self.options.api_key
+        if self.options.location:
+            self.location = self.options.location
+
+        if not all([self.username, self.api_key, self.location]):
+            self._se("You need to specify a username/api_key/location either " + \
+                "via the command line or via the environment variables " + \
+                "UK_RCLOUD_USER UK_RCLOUD_KEY UK_RCLOUD_LOCATION")
+            sys.exit(1)
+
+        self.parse_syntax(args)
+
+if __name__ == '__main__':
+    C = CLBCli()
+    C.main()
