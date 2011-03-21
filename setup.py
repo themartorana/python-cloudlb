@@ -16,7 +16,7 @@ def read(fname):
 
 setup(name=NAME,
       version=cloudlb.consts.VERSION,
-      download_url="%s/zipball/%s" % (GITHUB_URL, cloudlb.consts.VERSION),
+      #download_url="%s/zipball/%s" % (GITHUB_URL, cloudlb.consts.VERSION),
       description=DESCRIPTION,
       author='Chmouel Boudjnah',
       author_email='chmouel@chmouel.com',
