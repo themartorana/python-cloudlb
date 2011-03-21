@@ -83,7 +83,19 @@ List nodes of a LB::
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
 
-  lbs = clb.loadbalancers.list_deleted()
+  lbs = clb.loadbalancers.list()
+  lb = lbs[0] #get the first one
+  nodes=lb.nodes.filter(status='ENABLED')
+  for node in nodes:
+      print node.address
+
+Filter nodes via condition of a LB::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
+  lbs = clb.loadbalancers.list()
   lb = lbs[0] #get the first one
   for node in lb.nodes:
       print node.address
@@ -250,7 +262,7 @@ Monitor loadbalancer using HTTP(s)::
       timeout=10,
       attemptsBeforeDeactivation=3,
       path="/",
-      statusRegex="",
+      statusRegex="^[234][0-9][0-9]$",
       bodyRegex="testing")
   hm_monitor.add(hm)
 
