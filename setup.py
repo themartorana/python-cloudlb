@@ -3,7 +3,7 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 import os
 from setuptools import setup, find_packages
-import cloudlb.consts
+#import cloudlb.consts
 
 NAME = "python-cloudlb"
 GITHUB_URL = "https://github.com/chmouel/%s" % (NAME)
@@ -16,8 +16,8 @@ def read(fname):
 
 setup(name=NAME,
       requires=['httplib2',],
-      version=cloudlb.consts.VERSION,
-      #download_url="%s/zipball/%s" % (GITHUB_URL, cloudlb.consts.VERSION),
+      version=0.1,
+      download_url="%s/zipball/%s" % (GITHUB_URL, '0.1'),
       description=DESCRIPTION,
       author='Chmouel Boudjnah',
       author_email='chmouel@chmouel.com',
