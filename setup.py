@@ -15,7 +15,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name=NAME,
-      requires=['httplib2',]
+      requires=['httplib2',],
       version=cloudlb.consts.VERSION,
       #download_url="%s/zipball/%s" % (GITHUB_URL, cloudlb.consts.VERSION),
       description=DESCRIPTION,
