@@ -67,6 +67,58 @@ class CLBCli(object):
             self._se("We need a load balancer ID as argument.")
             sys.exit(1)
 
+    def create_loadbalancer(self, args):
+        req_attr=("name", "port", "protocol")
+        def parse_inside_str(s):
+            ndico = {}
+            ns = k[k.find('::') + 2:].split(',')
+            for nk in ns:
+                if not '=' in nk:
+                    self._se("%s is an invalid value" % (nk))
+                    sys.exit(1)
+                (nkk, nvv) = nk.split('=')
+                nvv = nvv.replace('"', '')
+                nvv = nvv.replace("'", '')
+                ndico[nkk] = nvv
+            return ndico
+
+        nodes = []
+        virtualIps = []
+        dico = {}
+        for k in args:
+            kk = k.lower()
+            if not '=' in k:
+                self._se("%s is an invalid value" % (k))
+                sys.exit(1)
+                
+            if kk.startswith("node"):
+                nodes.append(cloudlb.Node(**parse_inside_str(k)))
+            elif kk.startswith("virtualip"):
+                virtualIps.append(cloudlb.VirtualIP(**parse_inside_str(k)))
+            else:
+                (kk, vv) = k.split("=")
+                if kk.lower() in req_attr:
+                    vv = vv.replace('"', '')
+                    vv = vv.replace("'", '')
+                    dico[kk] = vv
+        if not nodes:
+            self._se("You have not specified a node")
+            sys.exit(1)
+            
+        if not virtualIps:
+            self._se("You have not specified a virtualIp")
+            sys.exit(1)
+
+        dico['nodes'] = nodes
+        dico['virtualIps'] = virtualIps
+        for x in req_attr:
+            if not x in dico:
+                self._se("You didn't specify a %s value" % (x))
+                sys.exit(1)
+
+        self._get_connexion()
+        self.cnx.loadbalancers.create(**dico)
+
     #LIST
     def list_loadbalancers(self, args):
         self._get_connexion()
@@ -138,9 +190,6 @@ class CLBCli(object):
         except cloudlb.errors.ResponseError:
                 raise
 
-        print "DONE: Request to delete loadbalancer %s:%s has been sent." % \
-            (loadbalancer.id, loadbalancer.name)
-
     def delete_accesslist(self, args):
         if len(args) != 2:
             self._se("We need as argument a loadBalancerId and a accessListID")
@@ -166,11 +215,6 @@ class CLBCli(object):
             if str(x).startswith('422'):
                 print "No access lists to delete."
                 sys.exit(0)
-
-        if not accessListID:
-            print "all access lists has been deleted"
-        else:
-            print "access lists rules %s deleted." % (accessListID)
 
     def delete_session_persistence(self, loadBalancerId):
         if not loadBalancerId.isdigit():
@@ -416,7 +460,6 @@ class CLBCli(object):
                 sys.exit(1)
             else:
                 raise
-        print "Accesslist Rules %s added." % (ruleArg)
 
     def add_node(self, args):
         loadbalancerId = args[0]
@@ -484,10 +527,8 @@ class CLBCli(object):
         loadbalancer = self._get_loadbalancer(loadbalancer)
         cl = loadbalancer.connection_logging()
         if enable:
-            print "Connectiong Logging Enabled"
             cl.enable()
         else:
-            print "Connectiong Logging Disabled"
             cl.disable()
 
     def set_node(self, args):
@@ -596,6 +637,18 @@ class CLBCli(object):
             self._se("%s is an invalid argument." % (first_arg))
             sys.exit(1)
 
+    def parse_create(self, args):
+        if len(args) == 0:
+            self._se("You didn't specify what you want to create.")
+            sys.exit(1)
+
+        first_arg = args[0]
+        if first_arg == "loadbalancer":
+            self.create_loadbalancer(args[1:])
+        else:
+            self._se("%s is an invalid argument." % (first_arg))
+            sys.exit(1)
+
     def parse_delete(self, args):
         if len(args) == 0:
             self._se("You didn't specify what you want to delete.")
@@ -605,7 +658,7 @@ class CLBCli(object):
         if first_arg == "loadbalancer":
             self._check_lb_arg(args)
             self.delete_loadbalancer(args[1])
-        if first_arg == "node":
+        elif first_arg == "node":
             self._check_lb_arg(args)
             self.delete_node(args[1:])
         elif first_arg == "access_list":
@@ -732,6 +785,8 @@ class CLBCli(object):
 
         if first_arg == "list":
             self.parse_list(rest)
+        elif first_arg == "create":
+            self.parse_create(rest)
         elif first_arg == "delete":
             self.parse_delete(rest)
         elif first_arg == "info":

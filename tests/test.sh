@@ -2,7 +2,7 @@
 #TODO: Add wait connection feature.
 cd $(python -c 'import os,sys;print os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1])))'  $0)
 
-A="python bin/cloudlb -u $US_RCLOUD_USER -k $US_RCLOUD_KEY -l ord"
+A="python bin/cloudlb -u $US_RCLOUD_USER -k $US_RCLOUD_KEY -l $US_RCLOUD_DATACENTER"
 LBTEST=4256
 set -e
 set -x
@@ -10,8 +10,14 @@ set -x
 #TODO: create loadBalancer
 #TODO-TEST: delete loadbalancerId
 
-### Lists
+### Create
+${A} create loadbalancer \
+    protocol="HTTP" name="unitTest1" port=80 \
+    node1::address="10.180.160.131",port=80,condition=ENABLED \
+    node2::address="10.180.160.130",port=80,condition=ENABLED \
+    virtualIp1::type=PUBLIC name="foo11"
 
+### Lists
 # List all LoadBalancers
 $A list loadbalancers >/dev/null
 
