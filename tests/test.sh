@@ -3,19 +3,16 @@
 cd $(python -c 'import os,sys;print os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1])))'  $0)
 
 A="python bin/cloudlb -u $US_RCLOUD_USER -k $US_RCLOUD_KEY -l $US_RCLOUD_DATACENTER"
-LBTEST=4256
+LBNAME="unitTestClb"
 set -e
 set -x
 
-#TODO: create loadBalancer
-#TODO-TEST: delete loadbalancerId
-
 ### Create
 ${A} create loadbalancer \
-    protocol="HTTP" name="unitTest1" port=80 \
+    protocol="HTTP" name=$LBNAME port=80 \
     node1::address="10.180.160.131",port=80,condition=ENABLED \
     node2::address="10.180.160.130",port=80,condition=ENABLED \
-    virtualIp1::type=PUBLIC name="foo11"
+    virtualIp1::type=PUBLIC
 
 ### Lists
 # List all LoadBalancers
@@ -23,6 +20,9 @@ $A list loadbalancers >/dev/null
 
 # List all deleted Loadbalancers
 $A list loadbalancers deleted >/dev/null
+
+# List filtering by 
+LBTEST=$(${A} list loadbalancers name=$LBNAME|sed 's/ID: //;s/,.*//')
 
 # List all nodes of a LoadBalancer (you can add filters as well see below)
 $A list nodes ${LBTEST} >/dev/null
@@ -153,3 +153,8 @@ sleep 5
 
 # Delete node by ID
 $A delete node ${LBTEST} ${NODEID}
+
+### Finish
+
+# delete loadBalancer
+${A} delete loadbalancer ${LBTEST}
