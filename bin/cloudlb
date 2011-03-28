@@ -14,16 +14,18 @@ class CLBCli(object):
     location = None
 
     def __init__(self):
-        self.username = os.environ.get('UK_RCLOUD_USER')
-        self.api_key = os.environ.get('UK_RCLOUD_KEY')
-        self.location = os.environ.get('UK_RCLOUD_LOCATION')
+        self.username = os.environ.get('RCLOUD_USER')
+        self.api_key = os.environ.get('RCLOUD_KEY')
+        self.location = os.environ.get('RCLOUD_LOCATION')
         self.options = None
         self.cnx = None
 
     def _se(self, s):
         sys.stderr.write("%s\n" % (s))
 
-    def _parse_variables_args(self, allowed_variables, other_args, strict=False):
+    def _parse_variables_args(self, allowed_variables,
+                              other_args,
+                              strict=False):
         config = {}
         for arg in other_args:
             if not '=' in arg:
@@ -41,7 +43,7 @@ class CLBCli(object):
             self._se("You don't have enough arguments specified'")
             sys.exit(1)
         return config
-        
+
     def _get_loadbalancer(self, loadbalancer):
         self._get_connexion()
         loadbalancer = int(loadbalancer)
@@ -68,7 +70,8 @@ class CLBCli(object):
             sys.exit(1)
 
     def create_loadbalancer(self, args):
-        req_attr=("name", "port", "protocol")
+        req_attr = ("name", "port", "protocol")
+
         def parse_inside_str(s):
             ndico = {}
             ns = k[k.find('::') + 2:].split(',')
@@ -90,7 +93,7 @@ class CLBCli(object):
             if not '=' in k:
                 self._se("%s is an invalid value" % (k))
                 sys.exit(1)
-                
+
             if kk.startswith("node"):
                 nodes.append(cloudlb.Node(**parse_inside_str(k)))
             elif kk.startswith("virtualip"):
@@ -104,7 +107,7 @@ class CLBCli(object):
         if not nodes:
             self._se("You have not specified a node")
             sys.exit(1)
-            
+
         if not virtualIps:
             self._se("You have not specified a virtualIp")
             sys.exit(1)
@@ -140,21 +143,24 @@ class CLBCli(object):
                 for d in lbs:
                     if 'id' in config and int(d.id) == int(config['id']):
                         filtered_lbs.append(d)
-                    elif 'port' in config and int(d.port) == int(config['port']):
+                    elif 'port' in config and \
+                            int(d.port) == int(config['port']):
                         filtered_lbs.append(d)
-                    elif 'protocol' in config and d.protocol.lower() == config['protocol'].lower():
+                    elif 'protocol' in config and \
+                            d.protocol.lower() == config['protocol'].lower():
                         filtered_lbs.append(d)
-                    elif 'name' in config and d.name.lower() == config['name'].lower():
+                    elif 'name' in config and \
+                            d.name.lower() == config['name'].lower():
                         filtered_lbs.append(d)
-                    elif 'status' in config and d.status.lower() == config['status'].lower():
+                    elif 'status' in config and \
+                            d.status.lower() == config['status'].lower():
                         filtered_lbs.append(d)
                     elif 'address' in config:
                         for ip in d.virtualIps:
                             if ip.address == config['address'].lower():
                                 filtered_lbs.append(d)
-                        
                 lbs = filtered_lbs
-                
+
         for lb in lbs:
             pvip = []
             try:
@@ -163,10 +169,12 @@ class CLBCli(object):
             except(AttributeError):
                 pass
             print "ID: %s, Name: %s, Address: %s, Port: %s, Protocol: %s, Status: %s" % \
-                (lb.id, lb.name, "/".join(pvip), lb.port, lb.protocol, lb.status )
-            
+                (lb.id, lb.name, "/".join(pvip),
+                 lb.port, lb.protocol,
+                 lb.status)
+
     def list_nodes(self, args):
-        loadbalancer=args[0]
+        loadbalancer = args[0]
         if not loadbalancer.isdigit():
             self._se("%s is not a Load Balancer ID" % (loadbalancer))
             sys.exit(1)
@@ -178,7 +186,7 @@ class CLBCli(object):
         if len(args) == 1:
             self._format_nodes(nodes)
             return
-        
+
         allowed_variables = ['condition', 'port', 'address', 'status', 'id']
         config = self._parse_variables_args(allowed_variables, args[1:])
         self._format_nodes(nodes.filter(**config))
@@ -200,7 +208,7 @@ class CLBCli(object):
         nodeId = int(nodeId)
         node = loadbalancer.nodes.get(nodeId)
         node.delete()
-        
+
     #DELETE
     def delete_loadbalancer(self, loadbalancer):
         if not loadbalancer.isdigit():
@@ -259,7 +267,7 @@ class CLBCli(object):
         loadbalancer = self._get_loadbalancer(loadBalancerId)
         hm = loadbalancer.healthmonitor()
         hm.delete()
-        
+
     #SHOW
     def show_limits(self):
         #TODO: 501 on the other LB (Round Robin)
@@ -438,7 +446,7 @@ class CLBCli(object):
         print "Nodes: "
         nodes = loadbalancer.nodes
         self._format_nodes(nodes, padding='  ')
-        
+
     def _format_nodes(self, nodes, padding=''):
         for node in nodes:
             nw = node.weight and node.weight or "0"
@@ -501,7 +509,7 @@ class CLBCli(object):
         node = cloudlb.node.Node(**config)
         loadbalancer = self._get_loadbalancer(loadbalancerId)
         loadbalancer.add_nodes([node])
-        
+
     #SET
     def set_session_persistence(self, args):
         from cloudlb.consts import SESSION_PERSISTENCE_TYPES
@@ -584,7 +592,7 @@ class CLBCli(object):
         for t in config:
             node[t] = config[t]
         node.update()
-        
+
     def set_loadbalancer(self, args):
         from cloudlb.consts import LB_ATTRIBUTES_MODIFIABLE, LB_PROTOCOLS
         loadbalancer = args[0]
@@ -600,11 +608,11 @@ class CLBCli(object):
             sys.exit(1)
         self._get_connexion()
         loadbalancer = self._get_loadbalancer(loadbalancer)
-        
+
         for t in config:
             loadbalancer[t] = config[t]
         loadbalancer.update()
-        
+
     def set_healthmonitor(self, args):
         from cloudlb.consts import HEALTH_MONITOR_TYPES
 
@@ -621,7 +629,7 @@ class CLBCli(object):
             "path",
             "statusRegex",
             "bodyRegex"]
-        
+
         config = self._parse_variables_args(allowed_variables, args[1:])
         if not config:
             return
@@ -633,9 +641,10 @@ class CLBCli(object):
                 not all(['path' in config,
                          'statusRegex' in config,
                          'bodyRegex' in config]):
-                self._se("You are missing some arguments for %s healthMonitor" % config['type'])
+                self._se("You are missing some arguments for %s healthMonitor" \
+                             % config['type'])
                 sys.exit(1)
-            
+
         self._get_connexion()
         loadbalancer = self._get_loadbalancer(loadbalancer)
         hm_monitor = loadbalancer.healthmonitor()
@@ -657,9 +666,7 @@ class CLBCli(object):
             #TODO: Filter!
             self.list_accesslists(args[1])
         elif first_arg == "nodes":
-            if len(args) == 1:
-                self._se("We need a load balancer ID as argument.")
-                sys.exit(1)
+            self._check_lb_arg(args)
             self.list_nodes(args[1:])
         else:
             self._se("%s is an invalid argument." % (first_arg))
@@ -788,17 +795,18 @@ class CLBCli(object):
     def parse_args(self, args=None):
         if not args:
             args = sys.argv
-        opparser = optparse.OptionParser(usage="TODO!")
+        opparser = optparse.OptionParser(usage=cloudlb.cli_help.USAGE,
+                                         epilog=cloudlb.cli_help.EPILOG)
         opparser.add_option('-u', '--username',
                             type='string',
-                            help="Rackspace Cloud Username")
+                            help="Rackspace Cloud Username or use the environement variable RCLOUD_USER")
         opparser.add_option('-k', '--api-key',
                             dest='api_key',
                             type='string',
-                            help="Rackspace Cloud API Key")
+                            help="Rackspace Cloud API Key or use the environement variable RCLOUD_KEY")
         opparser.add_option('-l', '--location',
                             type='string',
-                            help="Rackspace Cloud Location")
+                            help="Rackspace Cloud Location or use the environement variable RCLOUD_LOCATION")
         (options, args) = opparser.parse_args(args)
         return (options, args)
 
@@ -812,18 +820,32 @@ class CLBCli(object):
         rest = args[2:]
 
         if first_arg == "list":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_LIST
             self.parse_list(rest)
         elif first_arg == "create":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_CREATE
             self.parse_create(rest)
         elif first_arg == "delete":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_DELETE
+                sys.exit(0)
             self.parse_delete(rest)
-        elif first_arg == "info":
-            self.parse_info(rest)
         elif first_arg == "show":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_SHOW
+                sys.exit(0)
             self.parse_show(rest)
         elif first_arg == "set":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_SET
+                sys.exit(0)
             self.parse_set(rest)
         elif first_arg == "add":
+            if "help" in rest:
+                print cloudlb.cli_help.HELP_ADD
+                sys.exit(0)
             self.parse_add(rest)
         else:
             self._se("%s is an invalid argument." % (first_arg))
@@ -842,7 +864,7 @@ class CLBCli(object):
         if not all([self.username, self.api_key, self.location]):
             self._se("You need to specify a username/api_key/location either " + \
                 "via the command line or via the environment variables " + \
-                "UK_RCLOUD_USER UK_RCLOUD_KEY UK_RCLOUD_LOCATION")
+                "RCLOUD_USER RCLOUD_KEY RCLOUD_LOCATION")
             sys.exit(1)
 
         self.parse_syntax(args)

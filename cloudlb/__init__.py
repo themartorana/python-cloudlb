@@ -7,6 +7,7 @@ from cloudlb.virtualip import VirtualIP
 from cloudlb.consts import VERSION
 __version__ = VERSION
 from usage import get_usage
+from cloudlb import cli_help
 
 
 class CloudLoadBalancer(object):

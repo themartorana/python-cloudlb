@@ -2,7 +2,7 @@
 #TODO: Add wait connection feature.
 cd $(python -c 'import os,sys;print os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1])))'  $0)
 
-A="python bin/cloudlb -u $US_RCLOUD_USER -k $US_RCLOUD_KEY -l $US_RCLOUD_DATACENTER"
+A="python bin/cloudlb"
 LBNAME="unitTestClb"
 set -e
 set -x
