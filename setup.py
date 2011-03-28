@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 import cloudlb.consts
 
 NAME = "python-cloudlb"
-GITHUB_URL = "https://github.com/chmouel/%s" % (NAME)
+GITHUB_URL = "https://github.com/rackspace/%s" % (NAME)
 DESCRIPTION = "Python interface to Rackspace Load Balancer" + \
     " as a Service product"
 
