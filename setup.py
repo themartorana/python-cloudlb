@@ -17,7 +17,6 @@ def read(fname):
         return open(full_path).read()
     else:
         return ""
-    
 
 setup(name=NAME,
       version=cloudlb.consts.VERSION,
@@ -30,6 +29,7 @@ setup(name=NAME,
       license='MIT',
       include_package_data=True,
       zip_safe=False,
+      scripts=['bin/cloudlb'],
       packages=find_packages(exclude=['tests', 'debian']),
       tests_require=["nose"],
       test_suite="nose.collector",
