@@ -203,7 +203,7 @@ def convert_iso_datetime(dt):
         return dt
 
     if dt.endswith("Z"):
-        dt = dt.split('.')[0]
+        dt = dt.split('Z')[0]
         isoFormat = "%Y-%m-%dT%H:%M:%S"
 
     return datetime.datetime.strptime(dt, isoFormat)
