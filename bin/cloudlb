@@ -3,6 +3,7 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 
 import sys
+import time
 import os
 import optparse
 import cloudlb
@@ -47,9 +48,15 @@ class CLBCli(object):
     def _get_loadbalancer(self, loadbalancer):
         self._get_connexion()
         loadbalancer = int(loadbalancer)
-
         try:
-            loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
+            if self.options.wait_active:
+                while True:
+                    loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
+                    if loadbalancer.status == "ACTIVE":
+                        break
+                    time.sleep(1)
+            else:
+                loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
         except cloudlb.errors.ResponseError, x:
             if str(x).startswith('404'):
                 self._se("You have specified an invalid load balancer ID.")
