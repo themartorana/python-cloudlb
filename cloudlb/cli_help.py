@@ -88,15 +88,9 @@ Example:
 """
 
 HELP_SHOW = """
-usage: show [limits|usage|algorithms|protocols|healthmonitor|
+usage: show [usage|algorithms|protocols|healthmonitor|
              session_persistence|connection_logging|loadbalancer|
              access_list|node|nodes]
-
-- Show all load balancer limits :
-Usage:
-  show limits
-Example:
-  cloudlb show limits
 
 - Show all (or specific) load balancer usage :
 Usage:

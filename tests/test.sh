@@ -35,9 +35,6 @@ $A show usage >/dev/null
 # Show usage of specific LB
 $A show usage ${LBTEST} >/dev/null
 
-# Show Limits
-$A show limits >/dev/null  || true # TODO: Sometime work sometime don't
-
 # Show algorithms available
 $A show algorithms >/dev/null
 

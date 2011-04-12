@@ -275,22 +275,6 @@ class CLBCli(object):
         hm = loadbalancer.healthmonitor()
         hm.delete()
 
-    #SHOW
-    def show_limits(self):
-        #TODO: 501 on the other LB (Round Robin)
-        self._get_connexion()
-        ret = self.cnx.get_limits()
-        print 'Regexp: "%s"' % (ret['regex'])
-        print 'URI: "%s"' % (ret['uri'])
-        print "Limits"
-        for verb in ret['limit']:
-            print "  %s: Limit %s/%s Remaining: %s, Next-Available: %s" % \
-                (verb['verb'],
-                 verb['value'],
-                 verb['unit'].lower()[:3],
-                 verb['remaining'],
-                 cloudlb.base.convert_iso_datetime(verb['next-available']))
-
     #TODO: Make it pretty this is basically a json dump.
     def show_usage(self, args=None):
         if args and len(args) == 1:
@@ -766,9 +750,7 @@ class CLBCli(object):
 
         first_arg = args[0]
 
-        if first_arg == "limits":
-            self.show_limits()
-        elif first_arg == "usage":
+        if first_arg == "usage":
             self.show_usage(args[1:])
         elif first_arg == "algorithms":
             self.show_algorithms()
@@ -814,6 +796,11 @@ class CLBCli(object):
         opparser.add_option('-l', '--location',
                             type='string',
                             help="Rackspace Cloud Location or use the environement variable RCLOUD_LOCATION")
+        opparser.add_option('-w', '--wait',
+                            dest="wait_active",
+                            action='store_true',
+                            help="Wait for LoadBalancer being active before doing actions")
+        
         (options, args) = opparser.parse_args(args)
         return (options, args)
 
