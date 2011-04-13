@@ -8,6 +8,8 @@ import os
 import optparse
 import cloudlb
 
+# The limit of time before the LoadBalancer is available
+TIME_LIMIT=120
 
 class CLBCli(object):
     username = None
@@ -50,11 +52,18 @@ class CLBCli(object):
         loadbalancer = int(loadbalancer)
         try:
             if self.options.wait_active:
+                counter=0
                 while True:
                     loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
                     if loadbalancer.status == "ACTIVE":
                         break
+
+                    if counter >= TIME_LIMIT:
+                        self._se("LoadBalancer %d does not seem to come up as ACTIVE." % (loadbalancer.id))
+                        sys.exit(1)
+                    
                     time.sleep(1)
+                    counter += 1
             else:
                 loadbalancer = self.cnx.loadbalancers.get(loadbalancer)
         except cloudlb.errors.ResponseError, x:
