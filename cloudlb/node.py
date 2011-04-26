@@ -7,25 +7,41 @@ class NodeDict(SubResourceDict):
     def get(self, nodeId):
         for d in self.dico:
             if d.id == nodeId:
-                #I should probably not play with magic like that.
-                #I really need to make it less confusing this look like PERL.
-                return type(d)(parent=d._parent,
-                               **(d._parent.manager.api.client.get(
-                            "/loadbalancers/%d/nodes/%d.json" % \
-                                (d._parent.id, nodeId))[1].values()[0]))
+                return d
+
+    def filter(self,
+               id=None,
+               condition=None,
+               address=None,
+               port=None,
+               status=None):
+        ret = []
+        for d in self.dico:
+            if condition and d.condition.lower() == condition.lower():
+                ret.append(d)
+            if address and d.address.lower() == address.lower():
+                ret.append(d)
+            if id and int(id) == int(id):
+                ret.append(d)
+            if port and int(d.port) == int(port):
+                ret.append(d)
+            if status and d.status.lower() == status.lower():
+                ret.append(d)
+        return ret
 
 
 class Node(SubResource):
     def __repr__(self):
-        return "<Node: %s:%s>" % (self.address, self.port)
+        return "<Node: %s:%s:%s>" % (self.id, self.address, self.port)
 
-    def __init__(self, parent=None,
+    def __init__(self,
+                 weight=None,
+                 parent=None,
                  address=None,
                  port=None,
                  condition=None,
                  status=None,
                  id=None,
-                 weight=None,
                  **kwargs):
         self.port = port
         self.weight = weight

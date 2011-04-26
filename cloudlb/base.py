@@ -41,6 +41,9 @@ class Resource(object):
             return self.id == other.id
         return self._info == other._info
 
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
 
 class Manager(object):
     """ Managers interact with a particular type of API (loadbalancer,
@@ -125,7 +128,9 @@ class SubResourceManager(object):
 
     def get(self):
         ret = self.client.get("%s.json" % self.path)
-        return self.resource(**(ret[1][self.type]))
+        tt = ret[1][self.type]
+        if tt:
+            return self.resource(**(tt))
 
     def add(self, ssp):
         dico = ssp.toDict()
@@ -149,6 +154,9 @@ class SubResource(object):
             if not attr.startswith("_"):
                 ret[attr] = self.__dict__[attr]
         return ret
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
 
 class SubResourceDict(object):
@@ -193,4 +201,9 @@ def convert_iso_datetime(dt):
     isoFormat = "%Y-%m-%dT%H:%M:%S+0000"
     if type(dt) is datetime.datetime:
         return dt
+
+    if dt.endswith("Z"):
+        dt = dt.split('Z')[0]
+        isoFormat = "%Y-%m-%dT%H:%M:%S"
+
     return datetime.datetime.strptime(dt, isoFormat)

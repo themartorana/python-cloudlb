@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
-VERSION = "0.1"
+VERSION = "0.2"
 USER_AGENT = 'python-cloudb/%s' % VERSION
 
 # Default AUTH SERVER
@@ -29,5 +29,5 @@ VIRTUALIP_TYPES = ["PUBLIC", "SERVICENET"]
 # HealthMonitors Types
 HEALTH_MONITOR_TYPES = ['CONNECT', 'HTTP', 'HTTPS']
 
-# SessionPersistense Types
-SESSION_PERSISTENSE_TYPES = ['HTTP_COOKIE']
+# SessionPersistence Types
+SESSION_PERSISTENCE_TYPES = ['HTTP_COOKIE']

@@ -48,6 +48,17 @@ List LoadBalancers::
       for ip in lb.virtualIps:
           print "%s/%s" % (ip.ipVersion, ip.address)
 
+List deleted LoadBalancers::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
+  lbs = clb.loadbalancers.list_deleted()
+  for x in lbs:
+      print x.name
+
+
 Get LB by ID::
 
   #!/usr/bin/python
@@ -66,23 +77,25 @@ Delete LB::
   lb = clb.loadbalancers.get(LoadBalancerID)
   lb.delete()
 
-List deleted LBs::
-
-  #!/usr/bin/python
-  import cloudlb
-  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
-
-  lbs = clb.loadbalancers.list_deleted()
-  for x in lbs:
-      print x.name
-
 List nodes of a LB::
 
   #!/usr/bin/python
   import cloudlb
   clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
 
-  lbs = clb.loadbalancers.list_deleted()
+  lbs = clb.loadbalancers.list()
+  lb = lbs[0] #get the first one
+  nodes=lb.nodes.filter(status='ENABLED')
+  for node in nodes:
+      print node.address
+
+Filter nodes via condition of a LB::
+
+  #!/usr/bin/python
+  import cloudlb
+  clb = cloudlb.CloudLoadBalancer("username", "apikey","chicago")
+
+  lbs = clb.loadbalancers.list()
   lb = lbs[0] #get the first one
   for node in lb.nodes:
       print node.address
@@ -249,7 +262,7 @@ Monitor loadbalancer using HTTP(s)::
       timeout=10,
       attemptsBeforeDeactivation=3,
       path="/",
-      statusRegex="",
+      statusRegex="^[234][0-9][0-9]$",
       bodyRegex="testing")
   hm_monitor.add(hm)
 
@@ -279,7 +292,7 @@ Add http cookie session persistense::
   ssp = mylb.session_persistense()
   ssp.add(ss)
 
-Get session persistense::
+Get session persistence::
 
   #!/usr/bin/python
   import cloudlb

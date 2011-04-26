@@ -7,6 +7,7 @@ from cloudlb.virtualip import VirtualIP
 from cloudlb.consts import VERSION
 __version__ = VERSION
 from usage import get_usage
+from cloudlb import cli_help
 
 
 class CloudLoadBalancer(object):
@@ -28,11 +29,6 @@ class CloudLoadBalancer(object):
         endTime = endTime and endTime.isoformat()
         ret = get_usage(self.client, startTime=startTime, endTime=endTime)
         return ret
-
-    def get_limits(self):
-        #TODO: Work alternatively, probably backend problem one of the
-        #nodes return 500 when listing limits.
-        return self.client.get("/loadbalancers/limits")[1]['limits']['rate'][0]
 
     def get_algorithms(self):
         g = self.client.get("/loadbalancers/algorithms")[1]['algorithms']

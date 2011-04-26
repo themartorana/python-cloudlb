@@ -24,7 +24,8 @@ class VirtualIP(cloudlb.base.SubResource):
 
         if self.type and not self.type in VIRTUALIP_TYPES:
             #TODO: Proper check on conditon as well
-            raise Exception("You have specified a invalid type")
+            raise Exception("You have specified a invalid type: %s" % \
+                                (self.type))
 
         if not any([self.type, self.id]):
             #TODO: Proper check on conditon as well

@@ -8,12 +8,16 @@ from cloudlb.virtualip import VirtualIP
 from cloudlb.usage import get_usage
 from cloudlb.accesslist import AccessList
 from cloudlb.healthmonitor import HealthMonitorManager
-from cloudlb.sessionpersistense import SessionPersistenseManager
+from cloudlb.sessionpersistence import SessionPersistenceManager
 from cloudlb.connectionlogging import ConnectionLogging
 from cloudlb.connectionthrottle import ConnectionThrottleManager
 
 
 class LoadBalancer(base.Resource):
+    accessList = None
+    sessionPersistence = None
+    healthMonitor = None
+
     def __repr__(self):
         return "<LoadBalancer: %s>" % self.name
 
@@ -28,11 +32,17 @@ class LoadBalancer(base.Resource):
             if k == "nodes":
                 v = NodeDict([Node(parent=self, **x) for x in v])
 
+            if k == "sessionPersistence":
+                v = v['persistenceType']
+
+            if k == "cluster":
+                v = v['name']
+
             if k == "virtualIps":
                 v = [VirtualIP(parent=self, **x) for x in v]
 
             if k in ('created', 'updated'):
-                v['time'] = base.convert_iso_datetime(v['time'])
+                v = base.convert_iso_datetime(v['time'])
 
             setattr(self, k, v)
 
@@ -57,8 +67,8 @@ class LoadBalancer(base.Resource):
         hm = HealthMonitorManager(self.manager.api.client, base.getid(self))
         return hm
 
-    def session_persistense(self):
-        sm = SessionPersistenseManager(
+    def session_persistence(self):
+        sm = SessionPersistenceManager(
             self.manager.api.client, base.getid(self))
         return sm
 
@@ -120,8 +130,7 @@ class LoadBalancerManager(base.ManagerWithFind):
                  if x._info['status'] == "DELETED"]
 
     def create(self, name, port,
-               protocol, nodes, virtualIps,
-               ipgroup=None, meta=None, files=None):
+               protocol, nodes, virtualIps):
         """
         Create a new loadbalancer.
 
@@ -134,8 +143,6 @@ class LoadBalancerManager(base.ManagerWithFind):
 
         nodeDico = [x.toDict() for x in nodes]
         vipDico = [{ 'id': x.id } if getattr(x, 'id', None) != None else { 'type': x.type } for x in virtualIps]
-        # print vipDico
-        # print nodeDico
 
         if len(name) > 128:
             raise InvalidLoadBalancerName("LB name is too long.")
