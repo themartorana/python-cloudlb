@@ -3,11 +3,9 @@
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
 import os
 from setuptools import setup, find_packages
-<<<<<<< HEAD
+
 #import cloudlb.consts
 
-=======
->>>>>>> 104eb4e582cac11ba83d156a1e025f89cf95682e
 NAME = "python-cloudlb"
 GITHUB_URL = "https://github.com/rackspace/%s" % (NAME)
 DESCRIPTION = "Python interface to Rackspace Load Balancer" + \
